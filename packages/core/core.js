@@ -1,0 +1,12 @@
+{
+	"definition":
+	{
+		"auth":false,
+		"params":{
+			"wmethod":{
+				"required":true,
+				"type":"string"
+			}
+		}
+	}
+}

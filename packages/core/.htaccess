@@ -1,0 +1,4 @@
+<Files "std_auth_clients.json">
+  order allow,deny
+  deny from all;
+</Files>
