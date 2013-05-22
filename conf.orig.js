@@ -61,7 +61,7 @@
 			"init":"packages/developer/init.php",
 			"public":"packages/developer/developer.js",
 			"dependence":[
-				"_auth"
+				"_std_auth"
 			]
 		},
 		"web":{
