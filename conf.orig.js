@@ -11,8 +11,8 @@
 		"support":"gcore@johnynsk.ru",
 		"limit_max":300,
 		"limit_default":30,
-		"httproot":"http://johnynsk.ru/gcore/",
-		"linkroot":"http://johnynsk.ru/",
+		"httproot":"http://johnynsk.ru/v1/gcore/",
+		"linkroot":"http://johnynsk.ru/v1/",
 		"authorize_package":"_std_auth",
 		"trace_allow":[
 		],
