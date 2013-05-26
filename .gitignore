@@ -1,3 +1,4 @@
 logs/*
 standalone/*
+packages/custom/*
 conf.js
