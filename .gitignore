@@ -2,3 +2,4 @@ logs/*
 standalone/*
 packages/custom/*
 conf.js
+.htconf.js
