@@ -250,6 +250,7 @@ table.result tr.first{
 table.result{
 	border-collapse: collapse;
 	width: 100%;
+	background-color: #EEE;
 }
 table.result td.key{
 	text-align: right;
