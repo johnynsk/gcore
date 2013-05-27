@@ -834,10 +834,26 @@ EOF;
 				return 'false';
 		if(is_null($data))
 			return '<i>null</i>';
-		$str.='<ul>';
-		foreach($data as $key=>$value)
-			$str.="<li><b>$key</b>: ".$this->html_var_prepare($value)."</li>";
-		$str.='</ul>';
+		if(!self::isbindeep($data))
+		{
+			$str.='<ul>';
+			foreach($data as $key=>$value)
+				$str.="<li><b>$key</b>: ".$this->html_var_prepare($value)."</li>";
+			$str.='</ul>';
+		}else{
+			$str.='<table class="result">';
+			$i=0;
+			foreach($data as $key=>$value)
+			{
+				if($i%2==1)
+					$str.='<tr>';
+				else
+					$str.='<tr class="first">';
+				$i++;
+				$str.='<td class="key">'.$key.'</td><td>'.$this->html_var_prepare($value).'</td></tr>';
+			}
+			$str.='</table>';
+		}
 		return $str;
 	}
 	public function plain_prepare($data,$offset=0)
@@ -861,6 +877,15 @@ EOF;
 			$str.="\n";
 		}
 		return $str;
+	}
+	public function isbindeep($array)
+	{
+		foreach($array as $key=>$value)
+		{
+			if(is_object($value)||is_array($value))
+				return false;
+		}
+		return true;
 	}
 	public function plain_response($data=null,$return=false)
 	{
@@ -1001,6 +1026,8 @@ EOF;
 				$linkphp=$linkroot.'method/'.$params["method"].'.php?'.$query;
 				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json"?'.$query;
+				if(isset($params["subtitle"]))
+					$subtitle="<h3>".$params["subtitle"]."</h3>";
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
 					$links=<<<html
 					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linkphp}">PHP</a></span>
@@ -1029,6 +1056,7 @@ html;
 <div id="top"><h1>{$h1} <span class="right-floated"><a href="{$buttonlink}" class="ref-button">{$button}</a></span></h1></div>
 <div id="wrap">
 <h2>{$title}{$links}</h2>
+{$subtitle}
 {$text}
 <p class="info">Вы можете получать результат в требуемом формате.<br />
 Доступные форматы: JSON, XML, Plain-Text, HTML, PHP (serialize)</p>

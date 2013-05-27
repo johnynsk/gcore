@@ -239,3 +239,20 @@ span.formats{
 	display: block;
 	text-shadow: none;
 }
+table.result td{
+	padding: 0.5em 1em;
+	border: 1px solid #AAA;
+	border-spacing: 0;
+}
+table.result tr.first{
+	background-color: #DDD;
+}
+table.result{
+	border-collapse: collapse;
+	width: 100%;
+}
+table.result td.key{
+	text-align: right;
+	font-weight: bold;
+	width: 8em;
+}

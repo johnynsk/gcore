@@ -158,5 +158,5 @@ try{
 		$data->{GENERIC_CORE_ATTR}->method=$_ENV["params"]["method"];
 	if(!isset($_ENV["params"]["method"])&&defined("GENERIC_CORE_WEBSITE"))
 		$_ENV["params"]["method"]="website";
-	$_ENV["core"]->makeresponse($data,$_ENV["params"]["format"],NULL,array("title"=>"Произошла ошибка (исключение)","type"=>"error","method"=>$_ENV["params"]["method"]));
+	$_ENV["core"]->makeresponse($data,$_ENV["params"]["format"],NULL,array("title"=>"Произошла ошибка (исключение)","subtitle"=>$message,"type"=>"error","method"=>$_ENV["params"]["method"]));
 }
