@@ -4,7 +4,7 @@ try{
 	{
 		define("GENERIC_CORE_INIT",true);
 		if(!defined("GENERIC_CORE_STDERROR"))
-			require_once 'packages/core/_std/_std_errors.php';
+			require_once 'core/_std/_std_errors.php';
 		//parsing parameters{
 		$data=array();
 		if(isset($_SERVER["REQUEST_METHOD"])&&($_SERVER["REQUEST_METHOD"]=="PUT"||$_SERVER["REQUEST_METHOD"]=="DELETE"))
@@ -73,7 +73,7 @@ try{
 		if(!isset($_ENV["params"]["method"])&&!defined("GENERIC_CORE_WEBSITE"))
 			$_ENV["params"]["method"]="reference";
 		//parsing arguments}
-		include 'packages/core/core.php';
+		include 'core/core.php';
 		$_ENV["core"]=new core();
 		core::regObject($_ENV["core"],"core");
 

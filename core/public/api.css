@@ -1,0 +1,241 @@
+*{
+	font: inherit;
+	text: inherit;
+	color: inherit;
+	margin: 0;
+	padding: 0;
+}
+i{
+	font-style: italic;
+}
+u{
+	text-decoration: underline;
+}
+#wrap a{
+	text-decoration: none;
+	border: solid #666;
+	border-width: 0px 0px 1px;
+	border-color: transparent;
+	padding: .25em .5em;
+	border-radius: .5em;
+	color: #555;
+}
+#wrap a.arrow:before {
+	content: '>';
+	font-size: .8em;
+	padding: .25em;
+}
+#wrap a:hover {
+	color: #444;
+	border-color: #888;
+	background-color: #999;
+}
+#wrap a.newtab:hover:after {
+	content: '	(Open in new tab)';
+	color: #CCC;
+	font-size: .8em;
+}
+#top a{
+	border: none;
+}
+h2{
+	font-size: 1.3em;
+	margin-bottom: 1em;
+	text-shadow: 0px 1px 0px #000;
+}
+h3{
+	font-size: 1.2em;
+	margin-top: 0.5em;
+	margin-bottom: 0.7em;
+}
+body{
+	font-size: 10pt;
+	font-family: "Tahoma",sans-serif;
+	background-color: #AAA;
+}
+#top{
+	background-color: #444;
+	color: #BBB;;
+/*	text-shadow: 0px 1px 0px white;*/
+	padding: 1em;
+}
+body.error,body.success{
+	background-color: #CCC;
+}
+body.error #top{
+	background-color: #A33;
+	color: white;
+}
+body.success #top{
+	background-color: #3A3;
+	color: white;
+}
+#top.success{
+	background-color: #448;
+}
+.right-floated{
+	float: right;
+}
+.ref-button{
+	border-radius: .5em;
+	background-color: #AAA;
+	padding: .5em 1em;
+	font-size: .8em;
+	color: #333;
+	text-shadow: 1px 0px 0px #333;
+	letter-spacing: 1px;
+}
+.ref-button:active {
+	background-color: #999;
+}
+body.error #top .ref-button,body.success #top .ref-button{
+	text-shadow: 1px 0px 0px #AAA;
+	color: #AAA;
+	background-color: #444;
+}
+body.error #top .ref-button:active, body.success #top .ref-button:active {
+	background-color: #333;
+}
+h1{
+	max-width: 50em;
+	margin: 0 auto;
+}
+#wrap{
+	max-width: 46em;
+	margin: 1em auto;
+	border-radius: .5em;
+	padding: 2em;
+}
+ul{
+	list-style-position: inside;
+}
+ul li ul li{
+	margin-left: 1.5em;
+}
+li{
+	margin-bottom: 0.5em;
+}
+#copy{
+	max-width: 48em;
+	margin: 1em auto;
+}
+#copy address, #copy span{
+	font-size: 0.75em;
+}
+p{
+	margin-top: 1em;
+}
+p.info{
+	font-size: 0.8em;
+}
+div.key{
+	border-radius: .5em;
+	background-color: #CCC;
+	padding: .5em;
+	margin: .25em;
+}
+div.key span.name{
+	margin: 0 1em 0 .5em;
+	font-weight: bold;
+}
+div.key ul.allvalues{
+	display: inline-block;
+	background-color: #333;
+	border-radius: .5em;
+	margin: -.5em .5em;
+}
+div.key ul.allvalues li{
+	padding: .5em .5em;
+	margin: 0 0 0em;
+	display: inline-block;
+	color: white;
+}
+div.key ul.allvalues li:hover { 
+	border-radius: .5em;
+	background-color: #555;
+}
+div.key span.required{
+	background-color: #A33;
+	color: white;
+	border-radius: .5em;
+	padding: .5em 1em;
+}
+div.key span.optional{
+	background-color: #DDD;
+	color: 333;
+	border-radius: .5em;
+	padding: .5em 1em;
+}
+div.key span.unless{
+	margin: 0 -.75em 0 .5em;
+	background-color: white;
+	color: #A33;
+	padding: .25em .5em;
+	border-radius: .5em;
+}
+
+div.key span.description{
+	margin: 0em 1em;
+}
+#wrap ul.tree{
+	list-style-type: none;
+}
+#wrap ul.tree li{
+	background-color: #CCC;
+	border-radius: .5em;
+	margin: 0.25em;
+}
+#wrap ul.tree a{
+	display: block;
+}
+#wrap ul.tree a:before {
+	content: '';
+	padding: 0;
+	margin: 0;
+}
+#wrap ul.tree a:hover:after {
+	content: '';
+	padding: 0;
+	margin: 0;
+}
+span.new,span.deprecated,span.untested{
+	margin: 0 .5em;
+	background-color: #A33;
+	color: white;
+	border-radius: .5em;
+	font-size: .7em;
+	padding: .25em .5em;
+	vertical-align: top;
+}
+span.new{
+	background-color: #333;
+}
+.warning{
+	border-radius: .5em;
+	background-color: #CCC;
+	margin-bottom: .5em;
+}
+.warning span.title{
+	background-color: #A33;
+	min-height: 1em;
+	display: inline-block;
+/*	margin: -.25em -.5em 0em;*/
+	border-radius: .5em;
+	padding: .5em 1em;
+	color: white;
+	letter-spacing: 1px;
+	text-shadow: 1px 0px 0px white;
+}
+.warning span.text{
+	display: inline-block;
+	padding: .25em 1em;
+}
+.warning span.date{
+	font-weight: bolder;
+}
+span.formats{
+	margin: 0.5em 0;
+	font-size: 0.75em;
+	display: block;
+	text-shadow: none;
+}

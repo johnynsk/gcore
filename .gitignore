@@ -1,5 +1,5 @@
 logs/*
 standalone/*
-packages/custom/*
+packages/*
 conf.js
 .htconf.js

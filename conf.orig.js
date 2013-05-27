@@ -21,8 +21,8 @@
 	},
 	"packages":{
 		"mysqlix":{
-			"location":"packages/core/mysqlix/mysqlix.php",
-			"init":"packages/core/mysqlix/init.php",
+			"location":"core/mysqlix/mysqlix.php",
+			"init":"core/mysqlix/init.php",
 			"params":{
 				"host":"localhost",
 				"user":"root",
@@ -31,43 +31,43 @@
 			}
 		},
 		"_std_object":{
-			"location":"packages/core/_std/_std_object.php",
+			"location":"core/_std/_std_object.php",
 			"dependence":[
 				"mysqlix"
 			]
 		},
 		"_std_public":{
-			"location":"packages/core/_std/_std_public.php",
+			"location":"core/_std/_std_public.php",
 			"dependence":[
 				"_std_object"
 			]
 		},
 		"gcore_client":{
-			"location":"packages/gcore_client/gcore_client.php",
-			"init":"packages/gcore_client/init.php",
+			"location":"core/gcore_client/gcore_client.php",
+			"init":"core/gcore_client/init.php",
 			"recommends":[
 				"_auth"
 			]
 		},
 		"_std_auth":{
-			"location":"packages/core/_std/_std_auth.php",
-			"init":"packages/core/_std/_std_auth_init.php",
+			"location":"core/_std/_std_auth.php",
+			"init":"core/_std/_std_auth_init.php",
 			"params":{
-				"file_clients":"packages/core/std_auth_clients.json"
+				"file_clients":"core/std_auth_clients.json"
 			}
 		},
 		"developer":{
-			"location":"packages/developer/developer.php",
-			"init":"packages/developer/init.php",
-			"public":"packages/developer/developer.js",
+			"location":"core/developer/developer.php",
+			"init":"core/developer/init.php",
+			"public":"core/developer/developer.js",
 			"dependence":[
 				"_std_auth"
 			]
 		},
 		"web":{
 			"disabled":true,
-			"location":"packages/core/web/web.php",
-			"init":"packages/core/web/init.php",
+			"location":"core/web/web.php",
+			"init":"core/web/init.php",
 			"params":{
 				"theme":"themes/class/theme.php"
 			}
