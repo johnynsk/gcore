@@ -144,7 +144,7 @@ try{
 		GENERIC_CORE_ATTR=>(object)array(
 			"state"=>"error",
 			"api_version"=>$_ENV["core"]->api_version,
-			"time"=>time(),
+			"time"=>microtime(true),
 		),
 		"error"=>(object)array(
 			"@attr"=>(object)array(

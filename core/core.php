@@ -1003,7 +1003,7 @@ EOF;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json"?'.$query;
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
 					$links=<<<html
-					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a><a href="{$linkxml}">XML</a><a href="{$linktxt}">Plain</a><a href="{$linkhtml}">HTML</a><a href="{$linkphp}">PHP</a></span>
+					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linkphp}">PHP</a></span>
 html;
 				else
 					$links='';
