@@ -136,6 +136,7 @@ class core{
 				foreach($expr as $value)
 					if($data==$value)
 						return true;
+				return false;
 				break;
 			case 'preg':
 				if(!preg_match($expr,$data))
@@ -403,15 +404,63 @@ class core{
 			return '<p>No any parameters required</p>';
 		foreach($params as $key=>$value)
 		{
-			$out.='<div class="key"><span class="name">'.$key.'</span>';
-
+			$out.='<div class="key">';
 			if(isset($value->values))
 			{
 				$tmp='';
 				foreach($value->values as $k=>$v)
 					$tmp.='<li>'.$v.'</li>';
-				$out.='<ul class="allvalues">'.$tmp.'</ul>';
+				$out.='<ul class="allvalues right">'.$tmp.'</ul>';
 			}
+			$add="";
+			if(!isset($value->type))
+				$value->type="string";
+			switch($value->type)
+			{
+				case "uint":
+					$tmp='unsigned int';
+					break;
+				case "int":
+					$tmp='int';
+					break;
+				case "float":
+					$tmp='float';
+					break;
+				case "ufloat":
+					$tmp="unsigned float";
+					break;
+				case "array":
+					$tmp="array";
+					break;
+				case "object":
+					$tmp="object";
+					break;
+				case "bool":
+					$tmp="boolean";
+					break;
+				case "hex":
+					$tmp="hex";
+					break;
+				case "oct":
+					$tmp="oct";
+					break;
+				case "enum":
+					$tmp="enum";
+					$add=" values";
+					break;
+				case "preg":
+					if(isset($value->example))
+						$tmp=$value->example;
+					else
+						$tmp="expression";
+					break;
+				default:
+					$tmp="string";
+			}
+
+			$out.='<span class="type right'.$add.'">'.$tmp.'</span>';
+			$out.='<span class="name">'.$key.'</span>';
+
 
 			if(isset($value->required)&&$value->required==true)
 				if(isset($value->unless))
@@ -656,7 +705,7 @@ EOF;
 
 			if(isset($mtree->auth_ip)&&$mtree->auth_ip==true&&isset($mtree->allow_ip))
 			{
-				if(!isset($_SERVER)||!isset($_REMOTE_ADDR))
+				if(!isset($_SERVER)||!isset($_SERVER["REMOTE_ADDR"]))
 					$permit=false;
 				foreach($mtree->allow_ip as $ip)
 					if($ip==$_SERVER["REMOTE_ADDR"])

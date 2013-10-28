@@ -132,7 +132,7 @@ div.key{
 	border-radius: .5em;
 	background-color: #CCC;
 	padding: .5em;
-	margin: .25em;
+	margin: .4em;
 }
 div.key span.name{
 	margin: 0 1em 0 .5em;
@@ -142,23 +142,51 @@ div.key ul.allvalues{
 	display: inline-block;
 	background-color: #333;
 	border-radius: .5em;
-	margin: -.5em .5em;
+	border-radius:  0 .5em .5em 0;
+	margin: -.5em -.5em -.5em .5em;
+	overflow: hidden;
+	z-index: 3;
 }
 div.key ul.allvalues li{
-	padding: .5em .5em;
+	padding: .5em .7em;
 	margin: 0 0 0em;
 	display: inline-block;
 	color: white;
+	cursor: default;
 }
+
+
 div.key ul.allvalues li:hover { 
-	border-radius: .5em;
+/*	border-radius: .5em;*/
 	background-color: #555;
+
+}
+div.key ul.allvaules li:hover {
+	border-radius: 0 .5em .5em 0 !important;
+}
+div.key .right{
+	float: right;
+	margin-top: -0.5em;
+	margin-right: -0.5em;
+}
+div.key span.type{
+	background-color: #777;
+	border-radius: .5em;
+	padding: .5em 1em;
+	color: white;
+	z-index:1;
+}
+div.key span.type.values{
+	border-radius: .5em 0 0 .5em;
 }
 div.key span.required{
 	background-color: #A33;
 	color: white;
 	border-radius: .5em;
 	padding: .5em 1em;
+	margin: -0.5em 0;
+	display: inline-block;
+
 }
 div.key span.optional{
 	background-color: #DDD;

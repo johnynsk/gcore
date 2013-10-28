@@ -17,7 +17,7 @@ class _std_auth{
 		$sign=$res->sign;
 		if($sign!=$params["api_sig"])
 			if(!isset($noexception)||!$noexception)
-				throw new exception("signature is bad, authenticate problem ".$res->string);
+				throw new exception("signature is bad, authenticate problem",1);
 		return null;
 		return true;
 	}
