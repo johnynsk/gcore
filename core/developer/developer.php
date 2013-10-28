@@ -1,5 +1,11 @@
 <?php
 class developer{
+	function test($params)
+	{
+		if(!isset($params["string"]))
+			return "Authorization success!";
+		return $params["string"];
+	}
 	function time($params)
 	{
 		return date("d.m.Y H:i:s",$params["timestamp"]);

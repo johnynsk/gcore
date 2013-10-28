@@ -3,6 +3,29 @@ class _std_auth{
 	public $params;
 	protected $path;
 	protected $clients;
+	public function checkGrants($params,$package='',$method='')
+	{
+		core::check(array(
+			"api_key"=>array(true,'string')),$params);
+		$app=$this->getApp($params["api_key"]);
+		if(!isset($app->groups))
+			return true;
+		$permit=false;
+		foreach($app->groups as $pkg=>$methods)
+		{
+			if($pkg!=$package)
+				continue;
+			if($methods=="all"||$methods==$method)
+				return true;
+			foreach($methods as $mtd)
+			{
+				if($method==$mtd)
+					return true;
+			}
+		}
+		throw new exception("client doesn't have credentials to access this method",1);		
+		return null;
+	}
 	public function checkSign($params,$api_key=null,$api_sig=null,$noexception=null)
 	{
 		if(isset($api_key))

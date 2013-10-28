@@ -259,8 +259,8 @@ class core{
 			else
 				$this->api_client=false;
 		}
-
-		$this->checkGrants($package,$method);
+		if(isset($params["testapp"]))
+			$auth->checkGrants($params,$package,$method);
 		//insert grants checking
 		//reuse getConfig method
 

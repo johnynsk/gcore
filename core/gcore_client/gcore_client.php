@@ -7,6 +7,10 @@ class gcore_client{
 	public $post=false;
 	public $internal=true;
 	public $auth='';
+
+	public $api_key='';
+	public $api_secret='';
+	public $signame="api_sig";
 	private $curl;
 
 	static function sign($params,$postfix='',$prefix='')
@@ -79,7 +83,7 @@ class gcore_client{
 			throw new exception(curl_error($this->curl),curl_errno($this->curl));
 		return $res;
 	}
-	public function prepare_call($params,$sign=null,$signame="api_sig",$test=null)
+	public function prepare_call($params,$test=null)
 	{
 		if($this->internal)
 			if(!is_string($params["method"])&&!is_numeric($params["method"]))
@@ -91,13 +95,17 @@ class gcore_client{
 			unset($params["callback"]);
 			unset($params["format"]);
 		}
+		if(!empty($this->api_key))
+		{
+			$params["api_key"]=$this->api_key;
+		}
 
-		if($sign) //may be used by facebook, last.fm and other api's. used md5 principle;
+		if(!empty($this->api_secret)) //may be used by facebook, last.fm and other api's. used md5 principle;
 		{
 			$params2=$params;
 			unset($params2["callback"]);
 			unset($params2["format"]);
-			$params["api_sig"]=self::makeSign($params2,$sign);
+			$params[$this->signame]=self::makeSign($params2,$this->api_secret)->sign;
 		}
 
 		$method=$params["method"];
@@ -136,15 +144,17 @@ class gcore_client{
 		}
 		return $res;
 	}
-	public function call($params,$sign=null,$signame="api_sig",$test=null)
+	public function call($params,$test=null)
 	{
 		if(!is_string($params["method"])&&!is_numeric($params["method"]))
 			if(!$this->noexception)
 				throw new exception("method must be string");
-		$data=$this->prepare_call($params,$sign,$signame,$test);
-		if($test==true)
+		$data=$this->prepare_call($params,$test);
+		if($test==1||(is_bool($test)&&$test==true))
 			return $data;
 		$res=$this->exec($data->url,$data->post,10);
+		if($test==2)
+			return $res;
 		$res=json_decode($res);
 		if(json_last_error())
 			if(!$this->noexception)
