@@ -259,7 +259,7 @@ class core{
 			else
 				$this->api_client=false;
 		}
-		$auth->checkGrants($params,$package,$method);
+//		$auth->checkgrants($params,$package,$method);
 		//insert grants checking
 		//reuse getConfig method
 
@@ -568,6 +568,51 @@ EOF;
 		if(!$res)
 			throw new exception('file '.$path.' does not avaliable or empty',0);
 		return self::json_decode($res);
+	}
+	public function getReq($package)
+	{
+		$cfg=&$this->config;	
+		if(!isset($cfg->packages->{$package}))
+			throw new exception("try to get undeclarated package");
+		$cfg->packages->{$package};
+		$ret=array();
+		if(!isset($cfg->packages->{$package}))
+			return $ret;
+		$pkg=&$cfg->packages->{$package};
+		if(!isset($pkg->dependence))
+			return $ret;
+		foreach($pkg->dependence as $rpkg)
+		{
+			$ret[]=$rpkg;
+			$ret=array_merge($this->getReq($rpkg),$ret);
+		}
+		return $ret;
+	}
+	public function initReq($level,$package)
+	{
+		$pkgl=$this->getReq($package);
+		$cfg=&$this->config;
+		foreach($cfg->packages as $key=>$value)
+		{
+			if(!in_array($key,$pkgl))
+				continue;
+			if(!isset($value->{$level}))
+				continue;
+			if(isset($value->disabled)&&$value->disabled==true)
+				continue;
+			switch($mode)
+			{
+				case "tree":
+					$cfg->$opt->$key=self::json_remote($value->{$level});
+					break;
+				case "require":
+					if(!file_exists($value->{$level}))
+						throw new exception("file ".$value->{$level}." does not available or empty",0);
+					require_once($value->{$level});
+					break;
+			}
+		}
+		return true;
 	}
 	public function initLevel($level,$mode="require",$opt=false)
 	{
@@ -950,7 +995,7 @@ EOF;
 	public function safeCode($code)
 	{
 		if($code==0)
-			return false;
+			return true;
 		if($code>=0x200&&$code<0x400)
 			return false;
 		if($code>=0x2000&&$code<0x3FFF)

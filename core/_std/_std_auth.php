@@ -3,7 +3,7 @@ class _std_auth{
 	public $params;
 	protected $path;
 	protected $clients;
-	public function checkGrants($params,$package='',$method='')
+	public function checkgrants($params,$package='',$method='')
 	{
 		core::check(array(
 			"api_key"=>array(true,'string')),$params);

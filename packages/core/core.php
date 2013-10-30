@@ -259,7 +259,7 @@ class core{
 				$this->api_client=false;
 		}
 
-		$this->checkGrants($package,$method);
+		$auth->checkGrants($package,$method);
 		//insert grants checking
 		//reuse getConfig method
 
