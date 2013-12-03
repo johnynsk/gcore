@@ -49,8 +49,12 @@ class web{
 		if(is_array($data))
 		{
 			foreach($data as $key=>$value)
+			{
+				if(empty($value))
+					$value="";
 				if(is_string($value)||is_numeric($value))
 					$html=str_replace("%".$key.";",$value,$html);
+			}
 		}
 		return $html;
 	}

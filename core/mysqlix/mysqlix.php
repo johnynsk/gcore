@@ -93,7 +93,10 @@ class mysqlix extends mysqli {
 	{
 		$res=parent::__construct($host,$user,$pass,$db);
 		if($trace==true)
+		{
+			$this->trace=true;
 			$this->query("SET PROFILING=1");
+		}
 		return $res;
 	}
 };
