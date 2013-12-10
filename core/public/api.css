@@ -195,6 +195,7 @@ div.key span.optional{
 	padding: .5em 1em;
 }
 div.key span.unless{
+	display: inline-block;
 	margin: 0 -.75em 0 .5em;
 	background-color: white;
 	color: #A33;

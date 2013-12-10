@@ -11,10 +11,27 @@ try{
 		{
 			$http=fopen("php://input","r");
 			$tmp='';
-			while($data=fread($http,1024))
-				$tmp.=$data;
+			while($s=fread($http,1024))
+				$tmp.=$s;
 			fclose($http);
 			parse_str($tmp,$data);
+		}
+//		if(!empty($_GET["debug"]))
+//			print_r($_SERVER);
+		if(isset($_SERVER["HTTP_SOAPACTION"]))
+		{
+			$data["method"]=str_replace('"','',$_SERVER["HTTP_SOAPACTION"]);
+			$http=fopen("php://input","r");
+			$tmp='';
+			while($s=fread($http,1024))
+				$tmp.=$s;
+			fclose($http);
+			$tmp=str_replace("SOAP-ENV:","",$tmp);
+			$xml=simplexml_load_string($tmp);
+			foreach($xml->Body->parameters->item as $s)
+				$data[(string)$s->key]=(string)$s->value;
+			unset($xml);
+			$data["format"]="soap";
 		}
 		$_ENV["params"]=array_merge($_GET,$_POST,$_FILES,$data);
 		//parsing parameters}
@@ -94,7 +111,12 @@ try{
 			if(isset($_ENV["core"]->config->params->reference_allow)&&!in_array($_SERVER["REMOTE_ADDR"],$_ENV["core"]->config->params->reference_allow))
 				throw new exception("Access to reference denied");
 			else
-				$_ENV["core"]->declarateHTML();
+			{
+				if($_ENV["params"]["format"]=="wsdl")
+					$_ENV["core"]->declarateWSDL();
+				else
+					$_ENV["core"]->declarateHTML();
+			}
 	}
 	if(!defined("GENERIC_CORE_STANDALONE"))
 	{
@@ -110,6 +132,7 @@ try{
 			GENERIC_CORE_ATTR=>(object)array(
 				'state'=>'success',
 				'api_version'=>$_ENV["core"]->api_version,
+				'sys_version'=>$_ENV["core"]->version,
 				'time'=>microtime(true),
 			),
 			'result'=>$result);
@@ -144,6 +167,7 @@ try{
 		GENERIC_CORE_ATTR=>(object)array(
 			"state"=>"error",
 			"api_version"=>$_ENV["core"]->api_version,
+			"sys_version"=>$_ENV["core"]->version,
 			"time"=>microtime(true),
 		),
 		"error"=>(object)array(
@@ -158,5 +182,5 @@ try{
 		$data->{GENERIC_CORE_ATTR}->method=$_ENV["params"]["method"];
 	if(!isset($_ENV["params"]["method"])&&defined("GENERIC_CORE_WEBSITE"))
 		$_ENV["params"]["method"]="website";
-	$_ENV["core"]->makeresponse($data,$_ENV["params"]["format"],NULL,array("title"=>"Произошла ошибка (исключение)","subtitle"=>$message,"type"=>"error","method"=>$_ENV["params"]["method"]));
+	$_ENV["core"]->makeresponse($data,$_ENV["params"]["format"],NULL,array("title"=>"Произошла ошибка (исключение)","subtitle"=>$message,"code"=>$code,"type"=>"error","method"=>$_ENV["params"]["method"]));
 }

@@ -14,6 +14,7 @@ class core{
 	public $api_client=false;
 	public $api_auth=false;
 	public $api_version=0.9;
+	public $version="1.1.20131209";
 	public function setLimit($params)
 	{
 		if(!isset($params["limit"])||$params["limit"]<=0)
@@ -176,13 +177,10 @@ class core{
 				if(!$opt[0]&&isset($data[$key])&&!self::checktype($data[$key],$opt[1],$opt[2]))
 					throw new exception("field '$key' should be ".$opt[2],4);
 			}else{
-
-				if($opt[0]&&(!isset($data[$key])||!is_string($data[$key]))&&(!isset($value[2])||!isset($data[$opt[2]])))
-				{
-					throw new exception("field '$key' MUST be string",3);
-				}
+				if($opt[0]&&!isset($data[$key])&&isset($opt[2])&&isset($data[$opt[2]]))
+					continue;
 				if($opt[0]&&(!isset($data[$key])||!self::checktype($data[$key],$opt[1])))
-					throw new exception("field '$key' must be ".$opt[1]."; was ".$data[$key],3);
+					throw new exception("field '$key' must be ".$opt[1],3);
 				if(!$opt[0]&&isset($data[$key])&&!self::checktype($data[$key],$opt[1]))
 					throw new exception("field '$key' should be ".$opt[1],4);
 			}
@@ -476,6 +474,74 @@ class core{
 		}
 		return $out;
 	}
+	function declarateWSDL($params=null)
+	{
+		$tree=$this->getTree($params);
+		if(isset($this->config->params)&&isset($this->config->params->linkroot))
+			$linkroot=$this->config->params->linkroot;
+		else
+			$linkroot='/';
+		$wsdl=<<<xml
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="http://cinema.hnet.ru" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="%root;">
+
+	<types>
+		<s:schema elementFormDefault="qualified" targetNamespace="%root;">
+			<s:element name="soapResponse">
+				<s:complexType>
+					<s:sequence>
+						<s:element name="soapResult" type="s0:Info" />
+					</s:sequence>
+				</s:complexType>
+			</s:element>
+		</s:schema>
+	</types>
+	
+	<message name="SoapIn">
+		<part name="parameters" element="s:string"/>
+	</message>
+	<message name="SoapOut">
+		<part name="parameters" element="s0:soapResponse"/>
+	</message>
+	
+	<portType name="cinemaSoap">
+%operations;
+	</portType>
+	
+	<binding name="cinemaSoap" type="s0:cinemaSoap">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+%bindings;
+	</binding>
+
+	<service name="cinema">
+		<port name="cinemaSoap" binding="s0:cinemaSoap">
+			<soap:address location="%root;soap/"/>
+		</port>
+	</service>
+</definitions>
+xml;
+//		print_r($wsdl);
+		if($tree["type"]!="service")
+			throw new exception("wrong use");
+		$op='';
+		$bnd='';
+		foreach($tree["tree"] as $method=>$params)
+		{
+			$bnd.=<<<xml
+			<operation name="{$method}"><soap:operation soapAction="{$tree["method"]}.{$method}" style="document"/><input><soap:body use="literal" /></input><output><soap:body use="literal" /></output></operation>
+
+xml;
+			$op.=<<<xml
+			<operation name="{$method}"><input message="s0:SoapIn" /><output message="s0:SoapOut" /></operation>
+
+xml;
+		}
+		$wsdl=str_replace("%operations;",$op,$wsdl);
+		$wsdl=str_replace("%bindings;",$bnd,$wsdl);
+		$wsdl=str_replace("%root;",$linkroot,$wsdl);
+		header("Content-Type: text/xml");
+		echo $wsdl;
+		die;
+	}
 	function declarateHTML($params=null)
 	{
 		$tree=$this->getTree($params);
@@ -539,6 +605,8 @@ EOF;
 			case 'service':
 			$reference=$this->genCoreHTML($tree['tree'],$tree['name'].".");
 			$text=<<<EOF
+	<h3>Новинка!</h3>
+	<p>Доступ к веб-сервису <strong>{$tree['method']}</strong> по протоколу SOAP: <a href="/reference/{$tree['method']}.wsdl">WSDL</a></p>
 	<h3>Доступные методы</h3>
 	{$reference}
 EOF;
@@ -897,7 +965,7 @@ EOF;
 	{
 		return json_decode(json_encode($data),true);
 	}
-	public static function xml_response($data,$return=false,$rootname="data")
+	public static function xml_response($data,$return=false,$rootname="data",$xml=null)
 	{
 //		$wrap='data';
 //		$data=core::objectToAssoc($data);
@@ -905,10 +973,10 @@ EOF;
 		if(!$return)
 		{
 			header("Content-Type: text/xml");
-			echo self::xml_encode($data,null,$rootname);
+			echo self::xml_encode($data,$xml,$rootname);
 			exit;
 		}
-		return self::xml_encode($data,null,$rootname);
+		return self::xml_encode($data,$xml,$rootname);
 	}
 	public function html_var_prepare($data)
 	{
@@ -982,8 +1050,9 @@ EOF;
 	}
 	public function plain_response($data=null,$return=false)
 	{
-		$data=$this->objectToAssoc($data);
-		$response=$this->plain_prepare($data);
+//		$data=$this->objectToAssoc($data);
+//		$response=$this->plain_prepare($data);
+		$response=var_export($data,true);
 		if(!$return)
 		{
 			header("Content-Type: text/plain");
@@ -1004,6 +1073,28 @@ EOF;
 			return false;
 		return true;
 	}
+	function soap_response($data,$fault=false,$params=null)
+	{
+		if(!$fault)
+			$soapbody=<<<xml
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="http://www.w3.org/2001/XMLSchema"><SOAP-ENV:Body><soapResponse>%data;</soapResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
+xml;
+		else
+			$soapbody=<<<xml
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="http://www.w3.org/2001/XMLSchema"><SOAP-ENV:Body><SOAP-ENV:Fault><faultcode>SOAP-ENV:Server</faultcode><faultstring>%message;</faultstring><detail>%data;</detail></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>
+xml;
+//		$data=array(
+		header("Content-Type: text/xml");
+		$xml=$this->xml_response($data,true,"soapResult");
+		$xml=str_replace('<?xml version="1.0"?'.'>','',$xml);
+		$xml=str_replace("%data;",$xml,$soapbody);
+		if(is_array($params))
+		{
+			if(isset($params["subtitle"]))
+				$xml=str_replace("%message;",$params["subtitle"],$xml);
+		}
+		print_r($xml);
+	}
 	public function makeresponse($data,$format=null,$callback=null,$params=null)
 	{
 		header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -1016,8 +1107,8 @@ EOF;
 			$name=$this->config->params->name;
 		else
 			$name="Generic Core";
-		if(isset($this->config->params->version))
-			$version=$this->config->params->version;
+		if(isset($this->version))
+			$version=$this->version;
 		else
 			$version="1.0";
 		if(isset($this->config->params->support))
@@ -1050,6 +1141,12 @@ EOF;
 			$data=array('error'=>$data);
 		switch($format)
 		{
+			case 'soap':
+				if(isset($params["type"])&&$params["type"]=="error")
+					$this->soap_response($data,true,$params);
+				else
+					$this->soap_response($data);
+				break;
 			case 'php':
 				$this->php_response($data);
 				break;
@@ -1118,12 +1215,13 @@ EOF;
 				$linktxt=$linkroot.'method/'.$params["method"].'.txt?'.$query;
 				$linkphp=$linkroot.'method/'.$params["method"].'.php?'.$query;
 				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
-				$linkjson=$linkroot.'method/'.$params["method"].'.json"?'.$query;
+				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
+				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
 				if(isset($params["subtitle"]))
 					$subtitle="<h3>".$params["subtitle"]."</h3>";
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
 					$links=<<<html
-					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linkphp}">PHP</a></span>
+					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkphp}">PHP</a></span>
 html;
 				else
 					$links='';
@@ -1152,7 +1250,7 @@ html;
 {$subtitle}
 {$text}
 <p class="info">Вы можете получать результат в требуемом формате.<br />
-Доступные форматы: JSON, XML, Plain-Text, HTML, PHP (serialize)</p>
+Доступные форматы: JSON, XML, Plain-Text, HTML, SOAP, PHP (serialize)</p>
 </div>
 <div id="copy"><span class="right-floated"><a href="mailto:{$mail}">{$mail}</a></span>
 <address>Generated with {$name}/{$version}, API Version: {$this->api_version} at {$date}</address></div>
