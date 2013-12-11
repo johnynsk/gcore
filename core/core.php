@@ -144,9 +144,9 @@ class core{
 					return false;
 				break;
 			case 'hex':
-				return self::checktype($data,'match','/^[a-z0-9]$/i');
+				return self::checktype($data,'preg','/^[a-f0-9]+$/i');
 			case 'oct':
-				return self::checktype($data,'match','/^0[0-7]+$/i');
+				return self::checktype($data,'preg','/^0[0-7]+$/i');
 			default:
 				throw new exception("unknown type for check data",16);
 		}
@@ -214,8 +214,13 @@ class core{
 			throw new exception("Method '{$method}' is not declarated like public method of service {$package}",0);
 		
 		$mtree=&$pkg->{$package}->{$method};
-
-		if(isset($mtree->auth)&&$mtree->auth==true&&$this->api_auth)
+		$ignoreauth=false;
+		if(isset($this->config->params->ignore_auth)&&is_array($this->config->params->ignore_auth))
+		{
+			if(isset($_SERVER)&&isset($_SERVER["REMOTE_ADDR"])&&in_array($_SERVER["REMOTE_ADDR"],$this->config->params->ignore_auth))
+				$ignoreauth=true;
+		}
+		if(isset($mtree->auth)&&$mtree->auth==true&&$this->api_auth&&!$ignoreauth)
 		{
 			$authorize=true;
 			if(isset($this->config->params)&&!empty($this->config->params->authorize_package))
@@ -257,7 +262,7 @@ class core{
 			else
 				$this->api_client=false;
 		}
-//		$auth->checkgrants($params,$package,$method);
+//$auth->checkgrants($params,$package,$method);
 		//insert grants checking
 		//reuse getConfig method
 
@@ -1050,8 +1055,6 @@ EOF;
 	}
 	public function plain_response($data=null,$return=false)
 	{
-//		$data=$this->objectToAssoc($data);
-//		$response=$this->plain_prepare($data);
 		$response=var_export($data,true);
 		if(!$return)
 		{
