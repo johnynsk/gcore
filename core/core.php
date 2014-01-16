@@ -220,6 +220,8 @@ class core{
 			if(isset($_SERVER)&&isset($_SERVER["REMOTE_ADDR"])&&in_array($_SERVER["REMOTE_ADDR"],$this->config->params->ignore_auth))
 				$ignoreauth=true;
 		}
+		if(isset($this->config->params->ignore_auth)&&isset($_ENV["LOGNAME"]))
+			$ignoreauth=true;
 		if(isset($mtree->auth)&&$mtree->auth==true&&$this->api_auth&&!$ignoreauth)
 		{
 			$authorize=true;
@@ -1055,7 +1057,8 @@ EOF;
 	}
 	public function plain_response($data=null,$return=false)
 	{
-		$response=var_export($data,true);
+//		$response=var_export($data,true);
+		$response=$this->plain_prepare($data);
 		if(!$return)
 		{
 			header("Content-Type: text/plain");

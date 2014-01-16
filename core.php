@@ -16,8 +16,6 @@ try{
 			fclose($http);
 			parse_str($tmp,$data);
 		}
-//		if(!empty($_GET["debug"]))
-//			print_r($_SERVER);
 		if(isset($_SERVER["HTTP_SOAPACTION"]))
 		{
 			$data["method"]=str_replace('"','',$_SERVER["HTTP_SOAPACTION"]);
@@ -33,7 +31,7 @@ try{
 			unset($xml);
 			$data["format"]="soap";
 		}
-		$_ENV["params"]=array_merge($_GET,$_POST,$_FILES,$data);
+		$_ENV["params"]=array_merge($_COOKIE,$_GET,$_POST,$_FILES,$data);
 		//parsing parameters}
 		//parsing arguments{
 		if(!isset($argc))
@@ -45,46 +43,44 @@ try{
 		foreach($argv as $key=>$value)
 		{
 			$e=explode("=",$value);
-			if(isset($e[0])&&isset($e[1]))
+			switch($e[0])
 			{
-				switch($e[0])
-				{
-					case '-m':
-					case '--method':
-					case '-method':
-						$_ENV["params"]["method"]=$e[1];
-						break;
-					case '-f':
-					case '--format':
-					case '-format':
-						$_ENV["params"]["format"]=$e[1];
-						break;
-					case '-conf':
-					case '-c':
-					case '--conf':
-						$_ENV["configpath"]=$e[1];
-						break;
-					case '-t':
-					case '-trace':
-					case '--trace':
-						$_ENV["usetrace"]=true;
-						break;
-					default:
-						if($key>1)
-						{
-							if($e[0]!='-h'&&$e[0]!='--help')
-								echo "Unknown argument '".$e[0]."'\n";
-							echo "Usage:\n--method call method\n-m\n\n--format Output format\n";
-							exit;
-						}
-				}
-			}else{
-				if($key>1)
-				{
-					echo "Unknown argument '".$e[0]."'\n";
-					echo "Usage:\n--method call method\n-m\n\n--format Output format\n";
-					exit;
-				}
+				case '-m':
+				case '--method':
+				case '-method':
+					$_ENV["params"]["method"]=$e[1];
+					break;
+				case '-f':
+				case '--format':
+				case '-format':
+					$_ENV["params"]["format"]=$e[1];
+					break;
+				case '-conf':
+				case '-c':
+					$_ENV["configpath"]=$e[1];
+					break;
+				case '-t':
+				case '-trace':
+					$_ENV["usetrace"]=true;
+					break;
+				case '-h':
+				case '--help':
+					echo "\nUsage:\n\t-m\t\n\t--method\tExecuting method name\n".
+					"\t-f\t \n\t--format\tOuput data format\n \t \tAvailable formats: json, soap, php, xml, txt, html".
+					"\n\t-c\n\t--conf\tPath to config data\n \t \tDefault: conf.js:.htconf.js\n".
+					"\t-t\t\n\t--trace\tShow output trace\n";
+					exit;			
+				default:
+					if($key==0)
+						continue;
+					if(!preg_match("#^--(.*)#si",$e[0],$m))
+					{
+						echo "Unknown argument '".$e[0]."'\n";
+						echo "Try to read help: --help\n";
+						exit;
+					}
+					$_ENV["params"][$m[1]]=$e[1];
+					break;
 			}
 		}
 		if(!isset($_ENV["params"]["method"])&&!defined("GENERIC_CORE_WEBSITE"))

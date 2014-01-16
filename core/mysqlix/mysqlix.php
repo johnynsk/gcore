@@ -14,7 +14,13 @@ class mysqlix extends mysqli {
 	{
 		if(is_numeric($string))
 			return $string;
-		$string=parent::real_escape_string($string);
+		if(!is_array($string))
+		{
+			$string=parent::real_escape_string($string);
+			return $string;
+		}
+		foreach($string as $k=>$v)
+			$string[$k]=parent::real_escape_string($v);
 		return $string;
 	}
 	public function pagequery($query,$limit=30,$page=1,$safe=true,$resultmode=MYSQLI_STORE_RESULT)
