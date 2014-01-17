@@ -12,7 +12,7 @@ $edx=null;
 print_r("Welcome to gcore shell\n");
 if(file_exists("config.ini"))
 {
-	print_r("RX: Loading config file config.ini");
+	print_r("RX: Loading config file config.ini\n");
 	$tmp=parse_ini_file("config.ini");
 	$set=array_merge($set,$tmp);
 }
@@ -68,7 +68,7 @@ while($cycle)
 				if(isset($set["auth"]))
 					$client->auth=$set["auth"];
 				echo "RX: Open host ".$set["host"]."\n";
-				echo "RX: Connection established";
+				echo "RX: Connection established\n";
 				$connected=true;
 				break;
 			case "exec":
@@ -88,7 +88,7 @@ while($cycle)
 					if(isset($set["auth"]))
 						$client->auth=$set["auth"];
 					echo "RX: Open host ".$set["host"]."\n";
-					echo "RX: Connection established";
+					echo "RX: Connection established\n";
 					$connected=true;
 				}
 				if($set["useauth"])
@@ -105,7 +105,6 @@ while($cycle)
 				}
 				echo "RX: Result stored into \$eax\n";
 				$eax=$res;
-				print_r($res);
 				break;
 			case "print":
 				if(empty($e[1]))
@@ -126,6 +125,7 @@ while($cycle)
 					{
 						print_r("RX: ");
 						print_r(${$e[1]});
+						print_r("\n");
 						break;
 					}
 				}
@@ -144,8 +144,6 @@ while($cycle)
 						throw new exception("unavailable file");
 					break;
 				}
-//				if(strtolower($e[1])=="data")
-//				{
 					if(file_exists($e[1]))
 					{
 						$tmp=file_get_contents($e[1]);
@@ -156,8 +154,6 @@ while($cycle)
 					}else
 						throw new exception("unavailable data file");
 					break;
-//				}
-//				throw new exception("you must specify what you're loading: config or data");
 			case "clear":
 				if(empty($e[1]))
 				{
@@ -204,9 +200,14 @@ while($cycle)
 				$cycle=false;
 				break;
 			case "close":
+				if(!$connected)
+				{
+					print_r("RX: Connection not opened\n");
+					break;
+				}
 				$connected=false;
-				print_r("RX:  Connection closed");
-				exit;
+				print_r("RX: Connection closed\n");
+				break;
 			default:
 				if($connected)
 				{
@@ -226,7 +227,6 @@ while($cycle)
 						$res=$client->call($tmp,$set["debug"]);
 						echo "RX:  Result stored into \$eax\n";
 						$eax=$res;
-						print_r($res);
 						break;
 					}
 				}
