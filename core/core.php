@@ -1223,6 +1223,7 @@ xml;
 				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
 				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
+				$subtitle="";
 				if(isset($params["subtitle"]))
 					$subtitle="<h3>".$params["subtitle"]."</h3>";
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
