@@ -1,10 +1,38 @@
 <?php
 class web{
+	static $block=array();
+	static function regblock($name,$value=null)
+	{
+		if(is_array($name))
+		{
+			foreach($name as $k=>$v)
+				self::regblock($k,$v);
+			return true;
+		}
+		self::$block[$name]=$value;
+		return true;
+	}
+	static function arraytostr($array)
+	{
+		$tmp="";
+		foreach($array as $obj)
+		{
+			if(!empty($tmp))
+				$tmp.=", ";
+			$tmp.=$obj->title;
+		}
+		return $tmp;
+	}
 	static function getblock($element)
 	{
-		if(!is_callable("getblock"))
-			throw new exception("global function getblock not defined");
-		return getblock($element);
+		if(!is_array(self::$block))
+			throw new exception("global array not defined");
+		if(!isset(self::$block[$element]))
+		{
+			var_dump(self::$block);
+			throw new exception("block not defined");
+		}
+		return self::$block[$element];
 	}
 	static function escapehtml($str)
 	{
@@ -70,10 +98,6 @@ class web{
 				throw new exception("unknown module");
 		}
 	}
-	function __construct()
-	{
-		$this->core=core::getObject("core");
-	}
 	static function navigation($link,$total,$limit,$from=0)
 	{
 		$cur=(int)($from/($limit))+1;
@@ -109,15 +133,15 @@ class web{
 		$html=<<<html
 <a href="%link;" class="pagenav %class;">%text;</a>
 html;
-		$html=web::prepare($html,array("link"=>$link));
+		$html=self::prepare($html,array("link"=>$link));
 		$tmp='';
 		if($from>1)
 		{
-			$tmp.=web::prepare($html,array("page"=>1,"class"=>"pagenav_first","text"=>1));
+			$tmp.=self::prepare($html,array("page"=>1,"class"=>"pagenav_first","text"=>1));
 			if($left!=$from&&$left!=($from-1))
 			{
 				$jumpto=$left*$limit;
-				$tmp.=web::prepare($html,array("page"=>$left,"class"=>"pagenav_dotted","text"=>"..."));
+				$tmp.=self::prepare($html,array("page"=>$left,"class"=>"pagenav_dotted","text"=>"..."));
 			}
 		}
 
@@ -125,16 +149,16 @@ html;
 		{
 			$jumpto=$i*$limit;
 			if($i==$cur)
-				$tmp.=web::prepare($html,array("page"=>$i,"class"=>"pagenav_current","text"=>$i));
+				$tmp.=self::prepare($html,array("page"=>$i,"class"=>"pagenav_current","text"=>$i));
 			else
 			{
 				if($i==1)
-					$tmp.=web::prepare($html,array("page"=>$i,"class"=>"pagenav_first","text"=>$i));
+					$tmp.=self::prepare($html,array("page"=>$i,"class"=>"pagenav_first","text"=>$i));
 				else
 					if($i==$max)
-						$tmp.=web::prepare($html,array("page"=>$i,"class"=>"pagenav_last","text"=>$i));
+						$tmp.=self::prepare($html,array("page"=>$i,"class"=>"pagenav_last","text"=>$i));
 					else
-						$tmp.=web::prepare($html,array("page"=>$i,"class"=>"","text"=>$i));
+						$tmp.=self::prepare($html,array("page"=>$i,"class"=>"","text"=>$i));
 			}
 		}
 	
@@ -143,10 +167,10 @@ html;
 			if($to!=$right&&$right!=($to+1))
 			{
 				$jumpto=$right*$limit;
-					$tmp.=web::prepare($html,array("page"=>$right,"class"=>"pagenav_dotted","text"=>"..."));
+					$tmp.=self::prepare($html,array("page"=>$right,"class"=>"pagenav_dotted","text"=>"..."));
 			}
 			$jumpto=$max*$limit;
-				$tmp.=web::prepare($html,array("page"=>$max,"class"=>"pagenav_last","text"=>$max));
+				$tmp.=self::prepare($html,array("page"=>$max,"class"=>"pagenav_last","text"=>$max));
 		}
 		return $tmp;
 

@@ -123,6 +123,7 @@ try{
 	{
 		$format=$_ENV["params"]["format"];
 		$method=$_ENV["params"]["method"];
+		$tstart=microtime(true);
 		$result=$_ENV["core"]->callMethod($method,$_ENV["params"]);
 		$data=(object)array(
 			GENERIC_CORE_ATTR=>(object)array(
@@ -130,6 +131,7 @@ try{
 				'api_version'=>$_ENV["core"]->api_version,
 				'sys_version'=>$_ENV["core"]->version,
 				'time'=>microtime(true),
+				'runtime'=>(microtime(true)-$tstart)
 			),
 			'result'=>$result);
 		if(isset($_ENV["params"]["method"]))
