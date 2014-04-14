@@ -14,8 +14,8 @@ class core{
 	protected $secret;
 	public $api_client=false;
 	public $api_auth=false;
-	public $api_version=0.9;
-	public $version="1.1.20140411";
+	static $api_version=0.9;
+	static $version="1.1.20140411";
 	public function setLimit($params)
 	{
 		if(!isset($params["limit"])||$params["limit"]<=0)
@@ -228,9 +228,9 @@ class core{
 		{
 			$authorize=true;
 			if(isset($this->config->params)&&!empty($this->config->params->authorize_package))
-				$auth=core::getObject($this->config->params->authorize_package);
+				$auth=self::getObject($this->config->params->authorize_package);
 			else
-				$auth=core::getObject("_std_auth");
+				$auth=self::getObject("_std_auth");
 			if(!$auth)
 				throw new exception("authorize package not initialized");
 			if(!isset($mtree->params->api_key))
@@ -243,7 +243,7 @@ class core{
 					"type"=>"string");
 		}
 
-		$o=core::getObject($package);
+		$o=self::getObject($package);
 		if(!$o)
 			throw new exception("default package example not defined for ".$package);
 
@@ -308,7 +308,7 @@ class core{
 					$check[$k][2]=$v->unless;
 
 		}
-		return core::check($check,$params);
+		return self::check($check,$params);
 	}
 	private function parseMethodName($params)
 	{
@@ -609,7 +609,7 @@ $deprecate
 <h3>Аутентификация</h3>
 {$auth}
 EOF;
-				return core::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'text'=>$text,'title'=>'Описание веб-метода \''.$tree['service'].'.'.$tree['name'].'\'','h1'=>'Справочник по API: описание веб-метода','method'=>$tree['service']));
+				return self::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'text'=>$text,'title'=>'Описание веб-метода \''.$tree['service'].'.'.$tree['name'].'\'','h1'=>'Справочник по API: описание веб-метода','method'=>$tree['service']));
 				break;
 			case 'service':
 			$reference=$this->genCoreHTML($tree['tree'],$tree['name'].".");
@@ -619,7 +619,7 @@ EOF;
 	<h3>Доступные методы</h3>
 	{$reference}
 EOF;
-				return core::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'h1'=>'Справочник по API: описание веб-сервиса','text'=>$text,'title'=>'Описание веб-сервиса \''.$tree['name'].'\''));
+				return self::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'h1'=>'Справочник по API: описание веб-сервиса','text'=>$text,'title'=>'Описание веб-сервиса \''.$tree['name'].'\''));
 				break;
 			case 'core':
 			default:
@@ -628,7 +628,7 @@ EOF;
 <h3>Доступные сервисы</h3>
 {$reference}
 EOF;
-				return core::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'h1'=>'Справочник по API: список веб-сервисов','text'=>$text,'title'=>'Список веб-сервисов системы gcore'));
+				return self::makeresponse($tree['tree'],NULL,NULL,array('format'=>'html','nodata'=>true,'h1'=>'Справочник по API: список веб-сервисов','text'=>$text,'title'=>'Список веб-сервисов системы gcore'));
 				break;
 		}
 	}
@@ -775,7 +775,7 @@ EOF;
 				$this->trace=true;
 
 			if(isset($res->params->api_version))
-				$this->api_version=$res->params->api_version;
+				self::$api_version=$res->params->api_version;
 		}else{
 			$this->params=new stdClass();
 		}
@@ -977,7 +977,7 @@ EOF;
 	public static function xml_response($data,$return=false,$rootname="data",$xml=null)
 	{
 //		$wrap='data';
-//		$data=core::objectToAssoc($data);
+//		$data=self::objectToAssoc($data);
 //		$data=array($wrap=>$data);
 		if(!$return)
 		{
@@ -1126,7 +1126,7 @@ xml;
 		header("X-Powered-By: ".$name."/".$version);
 		if(isset($params))
 		{
-			core::check(array(
+			self::check(array(
 				'title'=>array(false,'string'),
 				'header'=>array(false,'string'),
 				'text'=>array(false,'string')),$params);
@@ -1141,7 +1141,7 @@ xml;
 			else
 				$text=$params['text'];
 		}
-		$params=core::setempty(array(
+		$params=self::setempty(array(
 			'method'=>'reference'),$params);
 		if(!isset($format))
 			$format='json';
@@ -1225,6 +1225,7 @@ xml;
 				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
 				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
+				$api_version=self::$api_version;
 				$subtitle="";
 				if(isset($params["subtitle"]))
 					$subtitle="<h3>".$params["subtitle"]."</h3>";
@@ -1262,7 +1263,7 @@ html;
 Доступные форматы: JSON, XML, Plain-Text, HTML, SOAP, PHP (serialize)</p>
 </div>
 <div id="copy"><span class="right-floated"><a href="mailto:{$mail}">{$mail}</a></span>
-<address>Generated with {$name}/{$version}, API Version: {$this->api_version} at {$date}</address></div>
+<address>Generated with {$name}/{$version}, API Version: {$api_version} at {$date}</address></div>
 </body>
 </html>
 EOF;

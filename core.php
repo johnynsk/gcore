@@ -128,8 +128,8 @@ try{
 		$data=(object)array(
 			GENERIC_CORE_ATTR=>(object)array(
 				'state'=>'success',
-				'api_version'=>$_ENV["core"]->api_version,
-				'sys_version'=>$_ENV["core"]->version,
+				'api_version'=>core::$api_version,
+				'sys_version'=>core::$version,
 				'time'=>microtime(true),
 				'runtime'=>(microtime(true)-$tstart)
 			),
@@ -164,8 +164,8 @@ try{
 	$data=(object)array(
 		GENERIC_CORE_ATTR=>(object)array(
 			"state"=>"error",
-			"api_version"=>$_ENV["core"]->api_version,
-			"sys_version"=>$_ENV["core"]->version,
+			"api_version"=>core::$api_version,
+			"sys_version"=>core::$version,
 			"time"=>microtime(true),
 		),
 		"error"=>(object)array(
