@@ -9,6 +9,7 @@ class core{
 	public $config;
 	public $safemode=false;
 	public $trace=false;
+	static $objects=array();
 	protected $client;
 	protected $secret;
 	public $api_client=false;
@@ -31,25 +32,26 @@ class core{
 	}
 	static function regObject($object,$name,$noexception=null)
 	{
-		if(!isset($_ENV["objects"]))
-			$_ENV["objects"]=array();
-		if(isset($_ENV["objects"][$name]))
+		if(!is_array(self::$objects))
+			self::$objects=array();
+		if(isset(self::$objects[$name]))
 			if(!isset($noexception)||!$noexception)
 				throw new exception("object '$name' has already registred",0);
 			else
 				return null;
-		$_ENV["objects"][$name]=$object;
+		self::$objects[$name]=$object;
+		return true;
 	}
 	static function getObject($name,$noexception=null)
 	{
-		if(!isset($_ENV["objects"]))
-			$_ENV["objects"]=array();
-		if(!isset($_ENV["objects"][$name]))
+		if(!is_array(self::$objects))
+			self::$objects=array();
+		if(!isset(self::$objects[$name]))
 			if(!isset($noexception)||!$noexception)
 				throw new exception("object '$name' is unavailable");
 			else
 				return null;
-		return $_ENV["objects"][$name];
+		return self::$objects[$name];
 	}
 	static function val($key,$val=null)
 	{
