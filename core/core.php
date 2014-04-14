@@ -1140,7 +1140,8 @@ xml;
 				$text='';
 			else
 				$text=$params['text'];
-		}
+		}else
+			$params=array();
 		$params=self::setempty(array(
 			'method'=>'reference'),$params);
 		if(!isset($format))
