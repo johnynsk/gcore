@@ -405,7 +405,7 @@ class core{
 	{
 		$out='';
 		if(!isset($params))
-			return '<p>No any parameters required</p>';
+			return '<p>Принимаемые параметры не перечислены в документации</p>';
 		foreach($params as $key=>$value)
 		{
 			$out.='<div class="key">';
@@ -561,7 +561,7 @@ xml;
 		{
 			case 'method':
 			if(!isset($tree['tree']->description))
-				$tree['tree']->description='<i>This method has no description</i>';
+				$tree['tree']->description='<i>У данного метода отсутствет описание</i>';
 			if(!isset($tree['tree']->params))
 				 $tree['tree']->params=null;
 			$p=&$tree['tree']->params;
@@ -601,8 +601,8 @@ EOF;
 			 $text=<<<EOF
 $deprecate
 <p>{$tree["tree"]->description}</p>
-<p><a class="newtab" target="_blank" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']}</a></p>
-<h3>Доступные параметры</h3>
+<p><a class="newtab" target="_blank" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
+<h3>Входные параметры</h3>
 {$params}
 <h3>Аутентификация</h3>
 {$auth}
