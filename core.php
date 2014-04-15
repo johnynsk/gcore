@@ -31,7 +31,7 @@ try{
 			unset($xml);
 			$data["format"]="soap";
 		}
-		$_ENV["params"]=array_merge($_COOKIE,$_GET,$_POST,$_FILES,$data);
+		$_ENV["params"]=array_merge($_GET,$_POST,$_FILES,$data);
 		//parsing parameters}
 		//parsing arguments{
 		if(!isset($argc))
@@ -131,7 +131,7 @@ try{
 				'api_version'=>core::$api_version,
 				'sys_version'=>core::$version,
 				'time'=>microtime(true),
-				'runtime'=>(microtime(true)-$tstart)
+				'runtime'=>round(microtime(true)-$tstart,9)
 			),
 			'result'=>$result);
 		if(isset($_ENV["params"]["method"]))
@@ -167,6 +167,7 @@ try{
 			"api_version"=>core::$api_version,
 			"sys_version"=>core::$version,
 			"time"=>microtime(true),
+			'runtime'=>round(microtime(true)-$tstart,9)
 		),
 		"error"=>(object)array(
 			"@attr"=>(object)array(

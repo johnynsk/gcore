@@ -137,13 +137,14 @@ div.key span.name{
 	margin: .6em 1em .6em 1em;
 	font-weight: bold;
 	display: inline-block;
+	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
 }
 div.key ul.allvalues{
 	display: inline-block;
 	background-color: #333;
 	border-radius: .5em;
 	border-radius:  0 .5em .5em 0;
-	margin: 0  0 -.5em 0;
+	margin: .3em  .3em -.5em -.3em;
 	overflow: hidden;
 	z-index: 3;
 }
@@ -153,6 +154,8 @@ div.key ul.allvalues li{
 	display: inline-block;
 	color: white;
 	cursor: default;
+	font-size: .8em;
+	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
 }
 
 
@@ -172,6 +175,9 @@ div.key span.type{
 	border-radius: .5em;
 	padding: .5em 1em;
 	color: white;
+	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
+	font-size: .8em;
+	margin: .3em .3em 0 0;
 	z-index:1;
 }
 div.key span.type.values{
@@ -184,13 +190,14 @@ div.key span.required{
 	padding: .5em 1em;
 	margin: -0.5em 0;
 	display: inline-block;
-
+	font-size: .8em;
 }
 div.key span.optional{
 	background-color: #DDD;
 	color: 333;
 	border-radius: .5em;
 	padding: .5em 1em;
+	font-size: .8em;
 }
 div.key span.unless{
 	display: inline-block;
@@ -285,6 +292,11 @@ table.result td.key{
 	font-weight: bold;
 	width: 8em;
 }
+div.result{
+	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
+	font-size: .85em;
+}
+
 @media print{
 	body{
 		font-size: 8pt;
@@ -301,6 +313,14 @@ table.result td.key{
 		padding: 2em 2em 0em;
 		max-width: 100%;
 	}
+	#copy{
+		margin: 0 auto;
+		max-width: 100%;
+		padding: 2em;
+	}
+	span.formats{
+		display: none;
+	}
 	div.key ul.allvalues li{
 		color: black !important;
 		font-weight: bold;
@@ -315,6 +335,9 @@ table.result td.key{
 	div.key{
 		border-radius: 0;
 		border-bottom: 1px solid #888;
+	}
+	div.key span.required, 	div.key span.optional{
+		font-size: .8em;
 	}
 	*{
 		letter-spacing: 0 !important;

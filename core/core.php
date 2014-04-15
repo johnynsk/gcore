@@ -141,14 +141,14 @@ class core{
 						return true;
 				return false;
 				break;
-			case 'preg':
+			case 'regexp':
 				if(!preg_match($expr,$data))
 					return false;
 				break;
 			case 'hex':
-				return self::checktype($data,'preg','/^[a-f0-9]+$/i');
+				return self::checktype($data,'regexp','/^[a-f0-9]+$/i');
 			case 'oct':
-				return self::checktype($data,'preg','/^0[0-7]+$/i');
+				return self::checktype($data,'regexp','/^0[0-7]+$/i');
 			default:
 				throw new exception("unknown type for check data",16);
 		}
@@ -170,7 +170,7 @@ class core{
 			if(!isset($opt[0])||!isset($opt[1]))
 				throw new exception("params for $key must contain 2 items",2);
 
-			if($opt[1]=="preg"||$opt[1]=="enum")
+			if($opt[1]=="regexp"||$opt[1]=="enum")
 			{
 				if(!isset($opt[2]))
 					throw new exception("params for $key must contain 3 items, specified by type",5);
@@ -272,7 +272,7 @@ class core{
 
 		return call_user_func(array($o,$method),$params);
 	}
-	function checkParams($method,$package,$params)
+	function checkParams($method,$package,&$params)
 	{
 		
 		$req=&$this->config->apiTree->{$package}->{$method};
@@ -306,7 +306,9 @@ class core{
 					$check[$k][3]=$v->unless;
 				else
 					$check[$k][2]=$v->unless;
-
+			if(isset($v->default)&&!isset($params[$k]))
+				$params[$k]=$v->default;
+				
 		}
 		return self::check($check,$params);
 	}
@@ -454,7 +456,7 @@ class core{
 					$tmp="enum";
 					$add=" values";
 					break;
-				case "preg":
+				case "regexp":
 					if(isset($value->example))
 						$tmp=$value->example;
 					else
@@ -470,11 +472,11 @@ class core{
 
 			if(isset($value->required)&&$value->required==true)
 				if(isset($value->unless))
-					$out.='<span class="required">обязательный <span class="unless">или '.$value->unless.'</span></span>';
+					$out.='<span class="required">обязательный <span class="unless">заменяется '.$value->unless.'</span></span>';
 				else
 					$out.='<span class="required">обязательный</span>';
 			else
-				$out.='<span class="optional">опциональный</span>';
+				$out.='<span class="optional">опция</span>';
 
 			if(isset($value->description))
 				$out.='<span class="description">'.$value->description."</span>";
@@ -528,7 +530,6 @@ class core{
 	</service>
 </definitions>
 xml;
-//		print_r($wsdl);
 		if($tree["type"]!="service")
 			throw new exception("wrong use");
 		$op='';
@@ -586,7 +587,6 @@ xml;
 						"description"=>"Signature for request"
 					);
 					$auth='<p>Этому методу <i>требуется</i> проверка подлинности</p><p>Используется проверка подлинности с помощью подписи запроса. Подпись запроса формируется следующим образом: md5-хэш от всех параметров + секретный ключ приложения. Все параметры должны быть отсортированы по ключу в алфавитном порядке и объединены в одну строку по следующей схеме &lt;key&gt;&lt;value&gt; (без&nbsp;символов&nbsp;&lt;&nbsp;&gt;). Вы не должны включать в эту строку параметры format и callback. К получившейся строке из параметров вы должны добавить ключ приложения. md5-хэш от результирующей строки и будет являться подписью запроса.</p><p>signature=md5(api_keyxxxxxxxmethodyyyyyyyapplicationsecret)</p>';
-//				$auth='<p>This method requires authentication.</p><p>Signature is a md5 hash of all given parameters + application secret key. All parameters must be sort alphabetically by parameter name and concatentaing into one string like &lt;key&gt;&lt;value&gt; scheme (without&nbsp;&lt;&nbsp;and&nbsp;&gt;&nbsp;chars). You must not include <strong>format</strong> and <strong>callback</strong> parameters. </p><p>Finally, you must include your application secret key to the resulting string and get md5 hash from string like this:</p><p>signature=md5(api_keyxxxxxxxmethodyyyyyyyapplicationsecret)</p>';
 			}
 			else
 				$auth='<p>Этому методу <strong>не требуется</strong> проверка подлинности</p>';
@@ -900,7 +900,7 @@ EOF;
 				if(is_numeric($val)||is_bool($val))
 					$item=$xml->addChild($key,(string)$val);
 				else
-					if(!preg_match('/^([0-9a-zA-Z-._ ]*)$/usi',$val))
+					if(!preg_match('/^([0-9a-zA-Z-_ а-я\/\"\'\:\,\.\(\)\;]*)$/usi',$val))
 						$item=$xml->addChild($key,"<![CDATA[$val]]>");
 					else
 						$item=$xml->addChild($key,$val);
@@ -1094,7 +1094,7 @@ xml;
 //		$data=array(
 		header("Content-Type: text/xml");
 		$xml=$this->xml_response($data,true,"soapResult");
-		$xml=str_replace('<?xml version="1.0"?'.'>','',$xml);
+		$xml=str_replace('<?xml version="1.0" encoding="UTF-8"?'.'>','',$xml);
 		$xml=str_replace("%data;",$xml,$soapbody);
 		if(is_array($params))
 		{
@@ -1231,9 +1231,12 @@ xml;
 				if(isset($params["subtitle"]))
 					$subtitle="<h3>".$params["subtitle"]."</h3>";
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
+				{
 					$links=<<<html
 					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkphp}">PHP</a></span>
 html;
+					$text='<div class="result">'.$text.'</div>';
+				}
 				else
 					$links='';
 				echo <<<EOF
@@ -1260,7 +1263,7 @@ html;
 <h2>{$title}{$links}</h2>
 {$subtitle}
 {$text}
-<p class="info">Вы можете получать результат в требуемом формате.<br />
+<p class="info">Вы также можете получить результат и в других форматах.<br />
 Доступные форматы: JSON, XML, Plain-Text, HTML, SOAP, PHP (serialize)</p>
 </div>
 <div id="copy"><span class="right-floated"><a href="mailto:{$mail}">{$mail}</a></span>
