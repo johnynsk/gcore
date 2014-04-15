@@ -55,16 +55,12 @@ class core{
 	}
 	static function val($key,$val=null)
 	{
-		$core=self::getObject('core');
-		$t=&$core->config->params;
-
-		if(!isset($t->$key)&&!isset($val))
-			throw new exception('unknown key');
-		
-		if(isset($val))
-			$t->$key=$val;
-
-		return $t->$key;
+		if(!isset(self::${$key}))
+			throw new exception("unknown key");
+		if(!isset($val))
+			return self::${$key};
+		self::${$key}=$val;
+		return self::${$key};
 	}
 	static function replace($params,$data,$reverse=false)
 	{
@@ -189,6 +185,15 @@ class core{
 		}
 		return true;
 	}
+	static function getParams($pkg=null)
+	{
+		$core=core::getObject("core");
+		if(!isset($core->config->packages->{$pkg}))
+			throw new exception("undefined package");
+		if(!isset($core->config->packages->{$pkg}->params))
+			return (object)array();
+		return $core->config->packages->{$pkg}->params;
+	}
 	public function getConfig($tree=null)
 	{
 		if(isset($tree))
@@ -260,6 +265,7 @@ class core{
 			else
 				$this->api_client=false;
 		}
+		$this->loadDefaults($method,$package,$params);
 //$auth->checkgrants($params,$package,$method);
 		//insert grants checking
 		//reuse getConfig method
@@ -300,13 +306,28 @@ class core{
 					$check[$k][3]=$v->unless;
 				else
 					$check[$k][2]=$v->unless;
-			if(isset($v->default)&&!isset($params[$k]))
-				$params[$k]=$v->default;
 				
 		}
 		return self::check($check,$params);
 	}
-	private function parseMethodName($params)
+	public function loadDefaults($method,$package,&$params)
+	{
+		$req=&$this->config->apiTree->{$package}->{$method};
+		if(!isset($req->params))
+			$req->params=null;
+		$req=&$req->params;
+		if(!is_array($req)&&!is_object($req))
+			return true;
+		foreach($req as $k=>$v)
+		{
+			if(!isset($v->default))
+				continue;
+			if(!isset($params[$k]))
+				$params[$k]=$v->default;
+		}
+		return $params;
+	}
+	public function parseMethodName($params)
 	{
 		if(preg_match("/^([a-zA-Z_0-9]{1,48})$/U",$params['method'],$match))
 		{
@@ -607,7 +628,7 @@ EOF;
 			 $text=<<<EOF
 $deprecate
 <p>{$tree["tree"]->description}</p>
-<p><a class="newtab" target="_blank" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
+<p><a class="newtab" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
 <h3>Входные параметры</h3>
 {$params}
 <h3>Аутентификация</h3>
@@ -669,7 +690,7 @@ EOF;
 		}
 		return $ret;
 	}
-	public function initReq($level,$package)
+	public function initReq($level,$package,$mode="require")
 	{
 		$pkgl=$this->getReq($package);
 		$cfg=&$this->config;
@@ -685,6 +706,23 @@ EOF;
 			{
 				case "tree":
 					$cfg->$opt->$key=self::json_remote($value->{$level});
+					$tmp=&$cfg->$opt->$key;
+					foreach($tmp as $method=>$settings)
+					{
+						if(!isset($settings->dataparams))
+							continue;
+					
+						foreach($settings->dataparams as $name)
+						{
+							if(!isset($cfg->dataparams))
+								throw new exception("missing dataparams parameter in config");
+							if(!isset($cfg->dataparams->$name))
+								throw new exception("missing standart definition for '".$name."' parameter");
+							$this->mergeParam($key,$method,$name,$cfg->dataparams->$name,$opt);
+						}
+					}
+					break;
+
 					break;
 				case "require":
 					if(!file_exists($value->{$level}))
@@ -797,8 +835,15 @@ EOF;
 			$this->checkConfig($flag);
 		}
 		$this->checkDependence();
-		if($flag==false)
-			$this->initLevel("init");
+		if(is_string($flag))
+		{
+			$res=$this->parseMethodName($flag);
+			if($res["type"]=="method")
+				return $res->initReq("init",$res["service"]);
+			elseif($res["type"]=="service")
+				return $res->initReq("init",$res["name"]);
+		}
+		$this->initLevel("init");
 		return true;
 	}
 	public function loadConfig($file=null)
@@ -1292,6 +1337,9 @@ html;
 				}
 				else
 					$links='';
+				$css='<link rel="stylesheet" type="text/css" href="'.$httproot.'core/public/api.css" />';
+				if(isset($this->config->params->optimize)&&$this->config->params->optimize&&file_exists(dirname(__FILE__)."/public/api.css"))
+					$css='<style type="text/css">'.file_get_contents(dirname(__FILE__)."/public/api.css").'</style>';
 				echo <<<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1303,7 +1351,7 @@ html;
 	<meta name="author" content="http://johnynsk.ru" />
 	<title>{$title}</title>
 	<link rel="icon" type="image/vdn.microsoft.icon" href="{$httproot}core/public/api.ico" />
-	<link rel="stylesheet" type="text/css" href="{$httproot}core/public/api.css" />
+	{$css}
 	<!--
 		coding&design by johny
 		http://johnynsk.ru/

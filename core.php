@@ -100,7 +100,10 @@ try{
 		if(isset($_ENV["params"]["method"])&&$_ENV["params"]["method"]=="reference")
 			$_ENV["core"]->checkConfig(true);
 		else
-			$_ENV["core"]->checkConfig(false);
+			if(isset($_ENV["params"]["method"]))
+				$_ENV["core"]->checkConfig($_ENV["params"]["method"]);
+			else
+				$_ENV["core"]->checkConfig(false);
 		if(!isset($_ENV["params"]["format"]))
 			$_ENV["params"]["format"]="html";
 		if(isset($_ENV["params"])&&isset($_ENV["params"]["method"])&&$_ENV["params"]["method"]=="reference")
