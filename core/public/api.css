@@ -53,6 +53,22 @@ body{
 	font-family: "Tahoma",sans-serif;
 	background-color: #AAA;
 }
+.sysval{
+	font-weight:bold;
+	text-transform:uppercase;
+	color: #009;
+	font-style:italic;
+}
+.sysval.bool{
+	color: #900;
+}
+.sysval.numeric{
+	color: black;
+	font-style:normal;
+}
+b,strong{
+	font-weight:bold;
+}
 #top{
 	background-color: #444;
 	color: #BBB;;

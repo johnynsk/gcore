@@ -233,14 +233,8 @@ class core{
 				$auth=self::getObject("_std_auth");
 			if(!$auth)
 				throw new exception("authorize package not initialized");
-			if(!isset($mtree->params->api_key))
-				$mtree->params->api_key=(object)array(
-					"required"=>true,
-					"type"=>"string");
-			if(!isset($mtree->params->api_sig))
-				$mtree->params->api_sig=(object)array(
-					"required"=>true,
-					"type"=>"string");
+			$this->mergeDefaultParam($package,$method,"api_key");
+			$this->mergeDefaultParam($package,$method,"api_sig");
 		}
 
 		$o=self::getObject($package);
@@ -574,19 +568,29 @@ xml;
 			}else
 			if($this->api_auth&&isset($tree['tree']->auth)&&$tree['tree']->auth==true)
 			{
-				if(!isset($p->api_key))
-					$p->api_key=(object)array(
-						"type"=>"string",
-						"required"=>"true",
-						"description"=>"Application key"
-					);
-				if(!isset($p->api_sig))
-					$p->api_sig=(object)array(
-						"type"=>"string",
-						"required"=>"true",
-						"description"=>"Signature for request"
-					);
-					$auth='<p>Этому методу <i>требуется</i> проверка подлинности</p><p>Используется проверка подлинности с помощью подписи запроса. Подпись запроса формируется следующим образом: md5-хэш от всех параметров + секретный ключ приложения. Все параметры должны быть отсортированы по ключу в алфавитном порядке и объединены в одну строку по следующей схеме &lt;key&gt;&lt;value&gt; (без&nbsp;символов&nbsp;&lt;&nbsp;&gt;). Вы не должны включать в эту строку параметры format и callback. К получившейся строке из параметров вы должны добавить ключ приложения. md5-хэш от результирующей строки и будет являться подписью запроса.</p><p>signature=md5(api_keyxxxxxxxmethodyyyyyyyapplicationsecret)</p>';
+				if(isset($this->config->dataparams))
+				{
+					if(!isset($p->api_key))
+						if(!isset($this->config->dataparams->api_key))
+							$p->api_key=(object)array(
+								"type"=>"string",
+								"required"=>"true",
+								"description"=>"Application key"
+							);
+						else
+							$p->api_key=$this->config->dataparams->api_key;
+					if(!isset($p->api_sig))
+						if(!isset($this->config->dataparams->api_sig))
+							$p->api_sig=(object)array(
+								"type"=>"string",
+								"required"=>"true",
+								"description"=>"Signature for request"
+							);
+						else
+							$p->api_sig=$this->config->dataparams->api_sig;
+					}
+
+					$auth='<p>Этому методу <strong><i>требуется</i></strong> проверка подлинности</p><p>Используется проверка подлинности с помощью подписи запроса. Подпись запроса формируется следующим образом: md5-хэш от всех параметров + секретный ключ приложения. Все параметры должны быть отсортированы по ключу в алфавитном порядке и объединены в одну строку по следующей схеме &lt;key&gt;&lt;value&gt; (без&nbsp;символов&nbsp;&lt;&nbsp;&gt;). Вы не должны включать в эту строку параметры format и callback. К получившейся строке из параметров вы должны добавить ключ приложения. md5-хэш от результирующей строки и будет являться подписью запроса.</p><p>api_sig=md5(api_keyxxxxxxxmethodyyyyyyyapplicationsecret)</p>';
 			}
 			else
 				$auth='<p>Этому методу <strong>не требуется</strong> проверка подлинности</p>';
@@ -691,6 +695,38 @@ EOF;
 		}
 		return true;
 	}
+	public function mergeDefaultParam($package,$method,$name,$tree="apiTree")
+	{
+		$cfg=&$this->config;
+		if(!isset($cfg->dataparams))
+			throw new exception("missing dataparams parameter in config");
+		if(!isset($cfg->dataparams->$name))
+			throw new exception("missing standart definition for '".$name."' parameter");
+
+		$this->mergeParam($package,$method,$name,$cfg->dataparams->$name,$tree);
+	}
+	public function mergeParam($package,$method,$name,$settings,$tree="apiTree")
+	{
+		$cfg=&$this->config;
+		if(!isset($cfg->$tree))
+			throw new exception("undefined tree '".$tree."'");
+		if(!isset($cfg->$tree->$package))
+			throw new exception("undefined package '".$package."' in tree '".$tree."'");
+
+		$pkg=&$cfg->$tree->$package;
+		if(!isset($pkg->$method))
+			throw new exception("undefined method '".$method."' in package '".$package."'");
+		if(!isset($pkg->$method->params)||(!is_object($pkg->$method->params)&&!is_array($pkg->$method->params)))
+			$pkg->$method->params=(object)array();
+		$params=&$pkg->$method->params;
+		if(!isset($pkg->$method->params->$name))
+			$params->$name=(object)array();
+		
+		//merge
+		//TODO WARNING (undefined definition of parameter :D)
+		$params->$name=(object)((array)$params->$name+(array)$settings);
+		return $params->$name;
+	}
 	public function initLevel($level,$mode="require",$opt=false)
 	{
 		$cfg=&$this->config;
@@ -704,6 +740,21 @@ EOF;
 			{
 				case "tree":
 					$cfg->$opt->$key=self::json_remote($value->{$level});
+					$tmp=&$cfg->$opt->$key;
+					foreach($tmp as $method=>$settings)
+					{
+						if(!isset($settings->dataparams))
+							continue;
+					
+						foreach($settings->dataparams as $name)
+						{
+							if(!isset($cfg->dataparams))
+								throw new exception("missing dataparams parameter in config");
+							if(!isset($cfg->dataparams->$name))
+								throw new exception("missing standart definition for '".$name."' parameter");
+							$this->mergeParam($key,$method,$name,$cfg->dataparams->$name,$opt);
+						}
+					}
 					break;
 				case "require":
 					if(!file_exists($value->{$level}))
@@ -992,6 +1043,8 @@ EOF;
 		$str='';
 		if(is_string($data)||is_numeric($data))
 		{
+			if(is_numeric($data))
+				return '<span class="sysval numeric">'.$data.'</span>';
 			$data=str_replace("<","&lt;",$data);
 			$data=str_replace(">","&gt;",$data);
 			$data=nl2br($data);
@@ -999,11 +1052,11 @@ EOF;
 		}
 		if(is_bool($data))
 			if($data)
-				return 'true';
+				return '<span class="sysval bool">true</span>';
 			else
-				return 'false';
+				return '<span class="sysval bool">false</span>';
 		if(is_null($data))
-			return '<i>null</i>';
+			return '<span class="sysval">null</span>';
 		if(!self::isbindeep($data))
 		{
 			$str.='<ul>';

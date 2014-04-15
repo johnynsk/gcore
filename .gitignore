@@ -3,7 +3,4 @@ standalone/*
 packages/*
 conf.js
 .htconf.js
-error_portmonet.log
-*.swp
-*.swo
-
+*.log

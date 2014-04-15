@@ -49,7 +49,7 @@ function errhandle($errno,$errstr,$errfile,$errline,$errcontext)
 	file_put_contents('./logs/summary_'.date("Y-m-d").'.log',$msg,FILE_APPEND);
 	exec('chmod 0777 ./logs/summary_'.date("Y-m-d").'.log 1>/dev/null 2>/dev/null');
 
-	file_put_contents('./logs/'.date("Y/m/d").'/debug_'.date("Y-m-d").'-'.$id.'.js',json_encode(@debug_backtrace()));
+	file_put_contents('./logs/'.date("Y/m/d").'/debug_'.date("Y-m-d").'-'.$id.'.js',@json_encode(@debug_backtrace()));
 
 	if($errno==E_USER_ERROR)
 	{
