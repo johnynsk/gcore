@@ -30,6 +30,16 @@ class core{
 		}
 		return $params;
 	}
+	static function rand($count=10)
+	{
+		$f=fopen("/dev/urandom","r");
+		$sum=0;
+		$str=fread($f,$count);
+		for($i=0;$i<$count;$i++)
+		{$sum.=ord($str[$i]);}
+		fclose($f);
+		return $sum;
+	}
 	static function regObject($object,$name,$noexception=null)
 	{
 		if(!is_array(self::$objects))

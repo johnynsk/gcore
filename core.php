@@ -128,13 +128,14 @@ try{
 		$method=$_ENV["params"]["method"];
 		$tstart=microtime(true);
 		$result=$_ENV["core"]->callMethod($method,$_ENV["params"]);
+		$tend=microtime(true);
 		$data=(object)array(
 			GENERIC_CORE_ATTR=>(object)array(
 				'state'=>'success',
 				'api_version'=>core::$api_version,
 				'sys_version'=>core::$version,
 				'time'=>microtime(true),
-				'runtime'=>round(microtime(true)-$tstart,9)
+				'runtime'=>round($tend-$tstart,9),
 			),
 			'result'=>$result);
 		if(isset($_ENV["params"]["method"]))
