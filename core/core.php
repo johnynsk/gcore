@@ -1213,8 +1213,8 @@ xml;
 			$name=$this->config->params->name;
 		else
 			$name="Generic Core";
-		if(isset($this->version))
-			$version=$this->version;
+		if(isset(self::$version))
+			$version=self::$version;
 		else
 			$version="1.0";
 		if(isset($this->config->params->support))
