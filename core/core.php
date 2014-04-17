@@ -15,7 +15,7 @@ class core{
 	public $api_client=false;
 	public $api_auth=false;
 	static $api_version=0.9;
-	static $version="1.1.20140411";
+	static $version="1.1.20140416";
 	public function setLimit($params)
 	{
 		if(!isset($params["limit"])||$params["limit"]<=0)
