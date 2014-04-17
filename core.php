@@ -34,7 +34,7 @@ try{
 		$_ENV["params"]=array_merge($_GET,$_POST,$_FILES,$data);
 		//parsing parameters}
 		//parsing arguments{
-		if(!isset($argc))
+		if(!isset($argc)||$argc<2)
 			$argc=0;
 		else
 			$_ENV["params"]["format"]="plain";
