@@ -5,24 +5,23 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  #b Methods logic block
-  #outputs with json
-  RewriteRule ^method/{0,1}$ /reference [QSA,R]
-  RewriteRule ^method/reference/{0,1}$ /reference [QSA,R]
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(js|json)$ gcore/core.php?method=$1.$3&format=json [QSA,L]
-  #outputs with xml
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(xml)$ gcore/core.php?method=$1.$3&format=xml [QSA,L]
-  #outputs with plain
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(txt)$ gcore/core.php?method=$1.$3&format=plain [QSA,L]
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(php)$ gcore/core.php?method=$1.$3&format=php [QSA,L]
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(html)$ gcore/core.php?method=$1.$3&format=html [QSA,L]
-  #outputs with generic
-  RewriteRule ^method/([^./]+)(/|\.)([^.]+)$ gcore/core.php?method=$1.$3 [QSA,L]
-  #e Methods logic block
-
-  RewriteRule ^reference/{0,1}$ gcore/core.php?method=reference [QSA,L]
-  RewriteRule ^reference/([a-zA-Z_0-9]{1,48})(/{0,1})$ gcore/core.php?method=reference&wmethod=$1 [QSA,L]
-  RewriteRule ^reference/([^./]+)(/|\.)([^.]+)$ /gcore/core.php?method=reference&wmethod=$1.$3 [QSA,L]
-
+	#gcore API begin
+		#reference section
+	  RewriteRule ^method/{0,1}$ /reference [QSA,R]
+	  RewriteRule ^method/reference/{0,1}$ /reference [QSA,R]
+	  RewriteRule ^reference/{0,1}$ gcore/core.php?method=reference [QSA,L]
+		RewriteRule ^reference/([a-zA-Z_0-9]{1,48}).wsdl/{0,1}$ gcore/core.php?method=reference&wmethod=$1&format=wsdl [QSA,L]
+	  RewriteRule ^reference/([a-zA-Z_0-9]{1,48})(/{0,1})$ gcore/core.php?method=reference&wmethod=$1 [QSA,L]
+	  RewriteRule ^reference/([^./]+)(/|\.)([^.]+)$ /gcore/core.php?method=reference&wmethod=$1.$3 [QSA,L]
+		
+		#rpc section
+	  RewriteRule ^soap/{0,1}$ gcore/core.php?format=soap [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(wsdl|soap)$ gcore/core.php?method=$1.$3&format=soap [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(js|json)$ gcore/core.php?method=$1.$3&format=json [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(xml)$ gcore/core.php?method=$1.$3&format=xml [QSA,L]
+		RewriteRule ^method/([^./]+)(/|\.)([^.]+).(php)$ gcore/core.php?method=$1.$3&format=php [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(txt)$ gcore/core.php?method=$1.$3&format=plain [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+).(html)$ gcore/core.php?method=$1.$3&format=html [QSA,L]
+	  RewriteRule ^method/([^./]+)(/|\.)([^.]+)$ gcore/core.php?method=$1.$3 [QSA,L]
 </IfModule>
 
