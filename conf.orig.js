@@ -72,5 +72,40 @@
 				"theme":"themes/class/theme.php"
 			}
 		}
+	},
+	"dataparams":{
+		"limit":{
+			"description":"Количество получаемых элементов",
+			"type":"uint",
+			"default":30,
+			"limit":300
+		},
+		"offset":{
+			"description":"Смещение результатов",
+			"type":"uint",
+			"default":0
+		},
+		"page":{
+			"description":"Страница результатов метода",
+			"type":"uint",
+			"default":1
+		},
+		"order":{
+			"type":"enum",
+			"values":["asc","desc"],
+			"description":"Направление сортировки"
+		},
+		"count":{
+			"type":"bool",
+			"description":"Возвращает только количество строк"
+		},
+		"api_key":{
+			"description":"Ключ пользователя API",
+			"required":true
+		},
+		"api_sig":{
+			"description":"Подпись запроса",
+			"required":true
+		}
 	}
 }
