@@ -1193,6 +1193,7 @@ xml;
 		header("Content-Type: text/xml");
 		$xml=$this->xml_response($data,true,"soapResult");
 		$xml=str_replace('<?xml version="1.0" encoding="UTF-8"?'.'>','',$xml);
+		$xml=str_replace('<?xml version="1.0"?'.'>','',$xml);
 		$xml=str_replace("%data;",$xml,$soapbody);
 		if(is_array($params))
 		{
