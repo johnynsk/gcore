@@ -1,8 +1,8 @@
 logs/*
 standalone/*
+.ht*
 packages/*
 conf.js
-.htconf.js
 *.log
 *.swp
 *.swo

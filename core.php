@@ -174,7 +174,7 @@ try{
 			'runtime'=>round(microtime(true)-$tstart,9)
 		),
 		"error"=>(object)array(
-			"@attr"=>(object)array(
+			GENERIC_CORE_ATTR=>(object)array(
 				GENERIC_CORE_CDATA=>$message,
 				"code"=>$code,
 			),
