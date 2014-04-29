@@ -6,3 +6,4 @@ conf.js
 *.log
 *.swp
 *.swo
+*.ini

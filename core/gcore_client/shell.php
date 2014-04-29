@@ -71,6 +71,16 @@ while($cycle)
 				echo "RX: Connection established\n";
 				$connected=true;
 				break;
+			case "help":
+				echo <<<plain
+Usage:
+	php	<inline code>	testing any php code
+		 (without code)	switching to php mode;
+	load	config|cfg	loads config file
+		data		load params file (JSON-encoded)
+	quit			quits from shell
+plain;
+				break;
 			case "exec":
 				if(!$connected)
 				{
