@@ -617,11 +617,16 @@ xml;
 				$auth='<p>Этому методу <strong>не требуется</strong> проверка подлинности</p>';
 			 $params=$this->getParamsHTML($tree['tree']->params);
 
-			 if(isset($tree['tree']->deprecate))
-				 $deprecate=<<<EOF
-<div class="warning"><span class="title">Deprecated</span><span class="text">This method will be banned since <span class="date">{$tree['tree']->deprecate}</span></span></div>
+
+			if(isset($tree['tree']->deprecate))
+			{
+				$dtime=$tree['tree']->deprecate;
+				if(is_numeric($dtime))
+					$dtime=date("d.m.Y",$dtime);
+				$deprecate=<<<EOF
+<div class="warning"><span class="title">Deprecated</span><span class="text">This method will be banned since <span class="date">{$dtime}</span></span></div>
 EOF;
-			 else
+			 }else
 				 $deprecate='';
 			 if(isset($tree['tree']->untested))
 				 $deprecate.='<div class="warning"><span class="title">Untested</span><span class="text">This method not tested yet, can be unavailable</span></div>';

@@ -1,5 +1,5 @@
 <?php
-abstract class _std_public extends _std_object{
+class _std_public extends _std_object{
 	public function get($params)
 	{
 		if(is_numeric($params))
