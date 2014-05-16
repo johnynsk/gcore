@@ -1,2 +1,2 @@
 <?php
-core::regObject(new developer(core::getObject("mysqlix")),"developer");
+core::regObject(new developer(),"developer");
