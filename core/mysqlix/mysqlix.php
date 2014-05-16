@@ -23,7 +23,7 @@ class mysqlix extends mysqli {
 			$string[$k]=parent::real_escape_string($v);
 		return $string;
 	}
-	public function offsetquery(string $query,$limit=30,$offset=1,$safe=true,$resultmode=MYSQLI_STORE_RESULT)
+	public function offsetquery($query,$limit=30,$offset=1,$safe=true,$resultmode=MYSQLI_STORE_RESULT)
 	{
 		if(!is_numeric($limit)||!is_bool($safe))
 			throw new exception('limit and page must be numeric, safe must be boolean');

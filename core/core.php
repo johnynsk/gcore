@@ -73,7 +73,7 @@ class core{
 	}
 	static function setempty($params,&$data)
 	{
-		if(!is_array($params)||!is_array($data))
+		if(!isset($params)||!is_array($params)||!isset($data)||!is_array($data))
 			throw new exception('both arguments must be array');
 		foreach($params as $key=>$value)
 		{
