@@ -1,5 +1,6 @@
 <?php
 try{
+	$tstart=microtime(true);
 	if(!defined("GENERIC_CORE_INIT"))
 	{
 		define("GENERIC_CORE_INIT",true);
@@ -144,7 +145,6 @@ try{
 			$_ENV["result"]=$data;
 		else{
 			$params=array("type"=>"success","method"=>$_ENV["params"]["method"]);
-			core::getObject("mysqlix")->close();
 			$_ENV["core"]->makeresponse($data,$format,NULL,$params);
 		}
 	}
