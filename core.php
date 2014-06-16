@@ -106,7 +106,7 @@ try{
 			$_ENV["core"]->checkConfig(true);
 		else
 			if(isset($_ENV["params"]["method"]))
-				$_ENV["core"]->checkConfig($_ENV["params"]["method"]);
+				$_ENV["core"]->checkConfig(array("method"=>$_ENV["params"]["method"]));
 			else
 				$_ENV["core"]->checkConfig(false);
 		if(!isset($_ENV["params"]["format"]))
