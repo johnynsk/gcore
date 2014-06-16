@@ -130,7 +130,7 @@ class _std_auth{
 		$tmp=$tmp->packages->_std_auth;
 		if(!isset($tmp->params)||!isset($tmp->params->file_clients))
 			throw new exception("parameter 'file_clients' must be set in settings of package _std_auth");
-		$this->path=$tmp->params->file_clients;
+		$this->path=core::$dir."/".$tmp->params->file_clients;
 		$this->_load();
 	}
 }

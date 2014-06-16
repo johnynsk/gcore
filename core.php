@@ -1,11 +1,15 @@
 <?php
 try{
 	$tstart=microtime(true);
+	if(!defined("GENERIC_CORE_ATTR"))
+		define("GENERIC_CORE_ATTR","@attr");
+	if(!defined("GENERIC_CORE_CDATA"))
+		define("GENERIC_CORE_CDATA","CDATA");
 	if(!defined("GENERIC_CORE_INIT"))
 	{
 		define("GENERIC_CORE_INIT",true);
 		if(!defined("GENERIC_CORE_STDERROR"))
-			require_once 'core/_std/_std_errors.php';
+			require_once dirname(__FILE__).'/core/_std/_std_errors.php';
 		//parsing parameters{
 		$data=array();
 		if(isset($_SERVER["REQUEST_METHOD"])&&($_SERVER["REQUEST_METHOD"]=="PUT"||$_SERVER["REQUEST_METHOD"]=="DELETE"))
@@ -87,12 +91,12 @@ try{
 		if(!isset($_ENV["params"]["method"])&&!defined("GENERIC_CORE_WEBSITE"))
 			$_ENV["params"]["method"]="reference";
 		//parsing arguments}
-		include 'core/core.php';
-		$_ENV["core"]=new core();
+		include dirname(__FILE__).'/core/core.php';
+		$_ENV["core"]=new core(dirname(__FILE__));
 		core::regObject($_ENV["core"],"core");
 
-		if(!isset($_ENV["configpath"])&&file_exists(".htconf.js"))
-			$_ENV["configpath"]=".htconf.js";
+		if(!isset($_ENV["configpath"])&&file_exists(core::$dir."/.htconf.js"))
+			$_ENV["configpath"]=core::$dir."/.htconf.js";
 
 		if(isset($_ENV["configpath"]))
 			$_ENV["core"]->loadConfig($_ENV["configpath"]);
