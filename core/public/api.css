@@ -62,6 +62,9 @@ body{
 .sysval.bool{
 	color: #900;
 }
+.sysval.value{
+	margin-left: .5em;
+}
 .sysval.numeric{
 	color: black;
 	font-style:normal;
@@ -122,6 +125,11 @@ h1{
 	border-radius: .5em;
 	padding: 2em;
 }
+table.form th{
+	text-align: left;
+	font-weight: bold;
+}
+
 ul{
 	list-style-position: inside;
 }
@@ -151,6 +159,9 @@ div.key, table.form tr{
 	border-radius: .5em;
 	background-color: #CCC;
 }
+table.form tr.using{
+	background-color: #EEE;
+}
 div.key{
 	margin: .4em;
 }
@@ -159,6 +170,20 @@ div.key span.name{
 	font-weight: bold;
 	display: inline-block;
 	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
+}
+.hidden{
+	display: none;
+}
+.toggler{
+	display: inline-block;
+	background-color: #BBB;
+	padding: .25em .7em;
+	border-radius:.5em;
+	cursor: pointer;
+	margin-right: .5em;
+}
+.toggler.active{
+	background-color: #DDD;
 }
 div.key ul.allvalues{
 	display: inline-block;
@@ -178,7 +203,6 @@ div.key ul.allvalues li{
 	font-size: .8em;
 	font-family: "DejaVu Sans Mono","Lucida Console",monospace;
 }
-
 
 div.key ul.allvalues li:hover { 
 /*	border-radius: .5em;*/
@@ -201,20 +225,29 @@ div.key span.type{
 	margin: .3em .3em 0 0;
 	z-index:1;
 }
-table.form td{
+table.form td,table.form th{
 	padding: .5em;
 	border-radius: .5em;
 }
 div.key span.type.values{
 	border-radius: .5em 0 0 .5em;
 }
-table.form td.name{
+table.form .name{
 	text-align: right;
 
 }
-table.form input{
+table.form input[type="text"]{
 	padding:.25em .5em;
 	min-width: 16em;
+}
+table.form input[type="submit"]{
+	padding: .25em .5em;
+	min-width: 16em;
+}
+table.form .checkbox{
+	text-align: center;
+	padding-left: 0;
+	padding-right: 0;
 }
 tr.done td{
 	text-align: center;
@@ -231,6 +264,12 @@ div.key span.required, table.form span.required{
 table.form span.required, table.form span.optional{
 	margin: 0;
 }
+table.form span.required .info{
+	border-bottom: 1px dashed white;
+}
+table.form span.optional .info{
+	border-bottom: 1px dashed black;
+}
 table.form option.null{
 	color: #3A3;
 	background-color: #CCC;
@@ -238,6 +277,7 @@ table.form option.null{
 table.form textarea{	
 	width: 17em;
 	height: 5em;
+	padding: .25em .5em;
 }
 div.key span.optional, table.form span.optional{
 	background-color: #DDD;

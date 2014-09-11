@@ -255,10 +255,7 @@ class core{
 
 		if(!is_callable(array($o,$method)))
 			throw new exception('this method is not available now');
-		if(isset($params["testformsanitize"]))
-			$this->checkParams($method,$package,$params,true);
-		else
-			$this->checkParams($method,$package,$params);
+		$this->checkParams($method,$package,$params);
 
 		if(isset($authorize))
 		{
@@ -432,9 +429,12 @@ class core{
 	}
 	function getParamsForm($params=null)
 	{
-		$out='<table class="form" id="testform"><input name="testformsanitize" value="1" type="hidden"/>';
+		$out='<table class="form" id="testform"><tr><th class="name">ключ</th><th class="checkbox"><span title="Не передавать параметр">?</span></th><th>значение</th></tr>';//<tr class="using"><td class="name"><span class="optional">format</span></td><td></td><td><select name="format"><option>html</option><option>json</option><option>xml</option><option>php</option><option>plain</option><option>soap</option></select></td></tr><tr class="using"><td class="name"><span class="optional">callback</span></td><td></td><td><select name="format"><option>html</option><option>json</option><option>xml</option><option>php</option><option>plain</option><option>soap</option></select></td></tr>';
 		if(!isset($params))
 			return '<p>Принимаемые параметры не перечислены в документации</p>';
+		$params2=array("format"=>(object)array("type"=>"enum","description"=>"Формат данных ответа","values"=>array("html","json","xml","php","plain","soap"),"default"=>"html","notnull"=>true,"required"=>true),"callback"=>(object)array("type"=>"expression","description"=>"Название функции для JSONP","regexp"=>"//"));
+		$params2+=(array)$params;
+		$params=(object)$params2;
 		foreach($params as $key=>$value)
 		{
 			if(isset($value->hidden)&&$value->hidden==true)
@@ -459,12 +459,12 @@ class core{
 					break;
 				case "text":
 					$tmp="text";
-					$input='<textarea id="form_'.$key.'" placeholder="text" name="'.$key.'"></textarea>';
+					$input='<textarea id="form_input_'.$key.'" placeholder="text" name="'.$key.'" class="form_input"></textarea>';
 					break;
 				case "ufloat":
 					$tmp="unsigned float";
 					break;
-				case "array":
+			case "array":
 					$tmp="array";
 					break;
 				case "object":
@@ -472,6 +472,7 @@ class core{
 					break;
 				case "bool":
 					$tmp="boolean";
+					$input='<input type="checkbox" id="form_input_'.$key.'" class="form_input"/><span id="form_check_'.$key.'" class="value sysval bool">false</span><input type="hidden" data-name="'.$key.'" class="form_checkfake" value="off"/>';
 					break;
 				case "hex":
 					$tmp="hex";
@@ -484,11 +485,14 @@ class core{
 					$add=" values";
 					if(isset($value->values)&&!empty($value->values))
 					{
-						$input='<select id="form_'.$key.'" name="'.$key.'">';
-						if(!isset($value->required)||$value->required==false)
-							$input.='<option class="null" value="">NULL</option>';
+						$input='<select id="form_input_'.$key.'" data-name="'.$key.'" class="form_input">';
+//						if(!isset($value->required)||$value->required==false)
+							$input.='<option class="null" value="">выберите из списка</option>';
 						foreach($value->values as $k=>$v)
-							$input.='<option value='.$v.'>'.$v.'</option>';
+							if(isset($value->default)&&$v==$value->default)
+								$input.='<option value='.$v.' selected="selected">'.$v.'</option>';
+							else
+								$input.='<option value='.$v.'>'.$v.'</option>';
 						$input.='</select>';
 					}
 					break;
@@ -496,29 +500,36 @@ class core{
 					if(isset($value->example))
 						$tmp=$value->example;
 					else
-						$tmp="expression";
+						$tmp=$value->regexp;
 					break;
 				default:
 					$tmp="string";
 			}
 			if(strlen($input)<1)
-				$input='<input id="form_'.$key.'" type="text" name="'.$key.'" placeholder="'.$tmp.'"/>';
+				$input='<input id="form_input_'.$key.'" type="text" data-name="'.$key.'" placeholder="'.$tmp.'" class="form_input"/>';
 
+			$keyname=$key;
+			if(isset($value->description))
+				$keyname='<span class="info" title="'.$value->description.'">'.$key.'</span>';
 
 			if(isset($value->required)&&$value->required==true)
 				if(isset($value->unless))
-					$out.='<td class="name"><label for="form_'.$key.'"><span class="required">'.$key.'* <span class="unless">заменяется '.$value->unless.'</span></span></label></td>';
+					$out.='<td class="name"><label for="form_input_'.$key.'"><span class="required">'.$keyname.'* <span class="unless">заменяется '.$value->unless.'</span></span></label></td>';
 				else
-					$out.='<td class="name"><label for="form_'.$key.'"><span class="required">'.$key.'*</span></label></td>';
+					$out.='<td class="name"><label for="form_input_'.$key.'"><span class="required">'.$keyname.'*</span></label></td>';
 			else
-				$out.='<td class="name"><label for="form_'.$key.'"><span class="optional">'.$key.'</span></label></td>';
+				$out.='<td class="name"><label for="form_input_'.$key.'"><span class="optional">'.$keyname.'</span></label></td>';
 
-			if(isset($value->description))
-				$out.='<td>'.$input.'</td>';
+//			if(isset($value->description))
+			if(!isset($value->notnull)||$value->notnull==false)
+				$out.='<td class="checkbox"><input type="checkbox" class="form_null" title="Не передавать параметр '.$key.'" checked="checked" /></td>';
+			else
+				$out.='<td class="checkbox"></td>';
+			$out.='<td>'.$input.'</td>';
 				
 			$out.='</tr>';
 		}
-		$out.='<tr class="done"><td colspan="2"><input type="submit" value="Отправить запрос" /></td></tr></table>';
+		$out.='<tr class="done"><td colspan="3"><input type="submit" value="Отправить запрос" /></td></tr></table><p>* - обязательный параметр</p>';
 		return $out;
 	}
 	function getParamsHTML($params=null)
@@ -738,13 +749,10 @@ EOF;
 $deprecate
 <p>{$tree["tree"]->description}</p>
 <p><a class="newtab" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
-<h3>Входные параметры</h3>
-{$params}
-<h3 id="openform">Форма для тестирования</h3>
-<form action="/method/{$tree['service']}.{$tree['name']}" method="post">
-
-{$form}
-</form>
+<h3><span class="toggler active" data-toggle="block-params">Входные параметры</span><span class="toggler" data-toggle="block-form">Форма для тестирования</span></h3>
+<div class="toggler-block" data-toggle="block-params">{$params}</div>
+<div class="toggler-block hidden" data-toggle="block-form"><form action="/method/{$tree['service']}.{$tree['name']}" method="post">{$form}</form>
+</div>
 <h3>Аутентификация</h3>
 {$auth}
 EOF;
@@ -1452,9 +1460,12 @@ html;
 				}
 				else
 					$links='';
+				$script='<script type="text/javascript" src="'.$httproot.'core/public/api.js"></script>';
+				if(isset($this->config->params->optimize)&&$this->config->params->optimize&&file_exists(dirname(__FILE__)."/public/api.js"))
+					$script='<script type="text/javascript">'.str_replace(array("\t","\n"),array("",""),file_get_contents(dirname(__FILE__)."/public/api.js")).'</script>';
 				$css='<link rel="stylesheet" type="text/css" href="'.$httproot.'core/public/api.css" />';
 				if(isset($this->config->params->optimize)&&$this->config->params->optimize&&file_exists(dirname(__FILE__)."/public/api.css"))
-					$css='<style type="text/css">'.file_get_contents(dirname(__FILE__)."/public/api.css").'</style>';
+					$css='<style type="text/css">'.str_replace(array("\t","\n"),array("",""),file_get_contents(dirname(__FILE__)."/public/api.css")).'</style>';
 				echo <<<EOF
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -1467,6 +1478,8 @@ html;
 	<title>{$title}</title>
 	<link rel="icon" type="image/vdn.microsoft.icon" href="{$httproot}core/public/api.ico" />
 	{$css}
+	{$script}
+	<script type="text/javascript" src="{$httproot}core/public/api.js"></script>
 	<!--
 		coding&design by johny
 		http://johnynsk.ru/
