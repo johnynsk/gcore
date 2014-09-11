@@ -444,9 +444,15 @@ class core{
 		{
 			if(isset($value->hidden)&&$value->hidden==true)
 				continue;
-			$out.='<tr>';
+			if(isset($value->notnull)&&$value->notnull==true)
+				$out.='<tr class="using">';
+			else
+				$out.='<tr>';
 
 			$add="";
+			$name="";
+			if(isset($value->notnull)&&$value->notnull=true)
+				$name=' name="'.$key.'" ';
 			if(!isset($value->type))
 				$value->type="string";
 
@@ -464,7 +470,7 @@ class core{
 					break;
 				case "text":
 					$tmp="text";
-					$input='<textarea id="form_input_'.$key.'" placeholder="text" name="'.$key.'" class="form_input"></textarea>';
+					$input='<textarea id="form_input_'.$key.'" placeholder="text" '.$name.' data-name="'.$key.'" class="form_input"></textarea>';
 					break;
 				case "ufloat":
 					$tmp="unsigned float";
@@ -477,7 +483,7 @@ class core{
 					break;
 				case "bool":
 					$tmp="boolean";
-					$input='<input type="checkbox" id="form_input_'.$key.'" class="form_input"/><span id="form_check_'.$key.'" class="value sysval bool">false</span><input type="hidden" data-name="'.$key.'" class="form_checkfake" value="off"/>';
+					$input='<input type="checkbox" id="form_input_'.$key.'" class="form_input"/><span id="form_check_'.$key.'" class="value sysval bool">false</span><input type="hidden" data-name="'.$key.'" '.$name.' class="form_checkfake" value="0"/>';
 					break;
 				case "hex":
 					$tmp="hex";
@@ -490,7 +496,7 @@ class core{
 					$add=" values";
 					if(isset($value->values)&&!empty($value->values))
 					{
-						$input='<select id="form_input_'.$key.'" data-name="'.$key.'" class="form_input">';
+						$input='<select id="form_input_'.$key.'" data-name="'.$key.'" '.$name.' class="form_input">';
 //						if(!isset($value->required)||$value->required==false)
 							$input.='<option class="null" value="">выберите из списка</option>';
 						foreach($value->values as $k=>$v)
