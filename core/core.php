@@ -16,6 +16,11 @@ class core{
 	public $api_auth=false;
 	static $api_version=0.9;
 	static $version="1.1.20140416";
+	static $dir="";
+	function __construct($dirname="")
+	{
+		self::$dir=$dirname;
+	}
 	public function setLimit($params)
 	{
 		if(!isset($params["limit"])||$params["limit"]<=0)
@@ -827,7 +832,7 @@ EOF;
 			switch($mode)
 			{
 				case "tree":
-					$cfg->$opt->$key=self::json_remote($value->{$level});
+					$cfg->$opt->$key=self::json_remote(self::$dir."/".$value->{$level});
 					$tmp=&$cfg->$opt->$key;
 					foreach($tmp as $method=>$settings)
 					{
@@ -847,9 +852,9 @@ EOF;
 
 					break;
 				case "require":
-					if(!file_exists($value->{$level}))
+					if(!file_exists(self::$dir."/".$value->{$level}))
 						throw new exception("file ".$value->{$level}." does not available or empty",0);
-					require_once($value->{$level});
+					require_once(self::$dir."/".$value->{$level});
 					break;
 			}
 		}
@@ -899,7 +904,7 @@ EOF;
 			switch($mode)
 			{
 				case "tree":
-					$cfg->$opt->$key=self::json_remote($value->{$level});
+					$cfg->$opt->$key=self::json_remote(self::$dir."/".$value->{$level});
 					$tmp=&$cfg->$opt->$key;
 					foreach($tmp as $method=>$settings)
 					{
@@ -917,9 +922,9 @@ EOF;
 					}
 					break;
 				case "require":
-					if(!file_exists($value->{$level}))
+					if(!file_exists(self::$dir."/".$value->{$level}))
 						throw new exception("file ".$value->{$level}." does not available or empty",0);
-					require_once($value->{$level});
+					require_once(self::$dir."/".$value->{$level});
 					break;
 			}
 
@@ -971,7 +976,7 @@ EOF;
 	public function loadConfig($file=null)
 	{
 		if(!isset($file))
-			$file='conf.js';
+			$file=self::$dir."/conf.js";
 		if(!file_exists($file))
 			throw new exception('configuration file mismatch',15);
 		$res=file_get_contents($file);
@@ -1081,7 +1086,7 @@ EOF;
 		foreach($cfg->packages as $key=>$value)
 		{
 			if(isset($value->init))
-				require_once($value->init);
+				require_once(self::$dir."/".$value->init);
 		}
 		return true;
 	}
