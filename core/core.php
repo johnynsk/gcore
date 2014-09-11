@@ -483,7 +483,7 @@ class core{
 					break;
 				case "bool":
 					$tmp="boolean";
-					$input='<input type="checkbox" id="form_input_'.$key.'" class="form_input"/><span id="form_check_'.$key.'" class="value sysval bool">false</span><input type="hidden" data-name="'.$key.'" '.$name.' class="form_checkfake" value="0"/>';
+					$input='<input type="checkbox" id="form_input_'.$key.'" class="form_input"/><span id="form_check_'.$key.'" class="value sysval bool">false</span><input type="hidden" data-name="'.$key.'" '.$name.' class="form_checkfake" value="false"/>';
 					break;
 				case "hex":
 					$tmp="hex";

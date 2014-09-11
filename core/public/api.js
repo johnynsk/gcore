@@ -40,11 +40,11 @@ window.onload=function()
 				var t=c.parentNode.getElementsByClassName("sysval")[0];
 				var i=c.parentNode.getElementsByClassName("form_checkfake")[0];
 				t.innerHTML="false";
-				i.value="0";
+				i.value="false";
 				if(c.checked)
 				{
 					t.innerHTML="true";
-					i.value="1";
+					i.value="true";
 				}
 			}
 		};
