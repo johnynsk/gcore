@@ -151,7 +151,7 @@ class core{
 		return true;
 	}
 	
-	static function check($params,$data)
+	static function check($params,&$data,$sanitize=false)
 	{
 		if(!is_array($params))
 			throw new exception('params must be array',516);
@@ -173,14 +173,21 @@ class core{
 				if($opt[0]&&(!isset($data[$key])||!self::checktype($data[$key],$opt[1],$opt[2])))
 					throw new exception("field '$key' must be ".$opt[1],3);
 				if(!$opt[0]&&isset($data[$key])&&!self::checktype($data[$key],$opt[1],$opt[2]))
-					throw new exception("field '$key' should be ".$opt[2],4);
-			}else{
+					if($sanitize&&strlen($data[$key])==0)
+						unset($data[$key]);
+					else
+						throw new exception("field '$key' should be ".$opt[2],4);
+				}else{
 				if($opt[0]&&!isset($data[$key])&&isset($opt[2])&&isset($data[$opt[2]]))
 					continue;
 				if($opt[0]&&(!isset($data[$key])||!self::checktype($data[$key],$opt[1])))
 					throw new exception("field '$key' must be ".$opt[1],3);
 				if(!$opt[0]&&isset($data[$key])&&!self::checktype($data[$key],$opt[1]))
-					throw new exception("field '$key' should be ".$opt[1],4);
+					if($sanitize&&strlen($data[$key])==0)
+						unset($data[$key]);
+					else
+						throw new exception("field '$key' should be ".$opt[1],4);
+
 			}
 		}
 		return true;
@@ -248,7 +255,10 @@ class core{
 
 		if(!is_callable(array($o,$method)))
 			throw new exception('this method is not available now');
-		$this->checkParams($method,$package,$params);
+		if(isset($params["testformsanitize"]))
+			$this->checkParams($method,$package,$params,true);
+		else
+			$this->checkParams($method,$package,$params);
 
 		if(isset($authorize))
 		{
@@ -272,7 +282,7 @@ class core{
 
 		return call_user_func(array($o,$method),$params);
 	}
-	function checkParams($method,$package,&$params)
+	function checkParams($method,$package,&$params,$sanitize=false)
 	{
 		
 		$req=&$this->config->apiTree->{$package}->{$method};
@@ -308,7 +318,7 @@ class core{
 					$check[$k][2]=$v->unless;
 				
 		}
-		return self::check($check,$params);
+		return self::check($check,$params,$sanitize);
 	}
 	public function loadDefaults($method,$package,&$params)
 	{
@@ -420,6 +430,97 @@ class core{
 			$wrap='No packages/methods available';
 		return $wrap;
 	}
+	function getParamsForm($params=null)
+	{
+		$out='<table class="form" id="testform"><input name="testformsanitize" value="1" type="hidden"/>';
+		if(!isset($params))
+			return '<p>Принимаемые параметры не перечислены в документации</p>';
+		foreach($params as $key=>$value)
+		{
+			if(isset($value->hidden)&&$value->hidden==true)
+				continue;
+			$out.='<tr>';
+
+			$add="";
+			if(!isset($value->type))
+				$value->type="string";
+
+			$input="";
+			switch($value->type)
+			{
+				case "uint":
+					$tmp='unsigned int';
+					break;
+				case "int":
+					$tmp='int';
+					break;
+				case "float":
+					$tmp='float';
+					break;
+				case "text":
+					$tmp="text";
+					$input='<textarea id="form_'.$key.'" placeholder="text" name="'.$key.'"></textarea>';
+					break;
+				case "ufloat":
+					$tmp="unsigned float";
+					break;
+				case "array":
+					$tmp="array";
+					break;
+				case "object":
+					$tmp="object";
+					break;
+				case "bool":
+					$tmp="boolean";
+					break;
+				case "hex":
+					$tmp="hex";
+					break;
+				case "oct":
+					$tmp="oct";
+					break;
+				case "enum":
+					$tmp="enum";
+					$add=" values";
+					if(isset($value->values)&&!empty($value->values))
+					{
+						$input='<select id="form_'.$key.'" name="'.$key.'">';
+						if(!isset($value->required)||$value->required==false)
+							$input.='<option class="null" value="">NULL</option>';
+						foreach($value->values as $k=>$v)
+							$input.='<option value='.$v.'>'.$v.'</option>';
+						$input.='</select>';
+					}
+					break;
+				case "regexp":
+					if(isset($value->example))
+						$tmp=$value->example;
+					else
+						$tmp="expression";
+					break;
+				default:
+					$tmp="string";
+			}
+			if(strlen($input)<1)
+				$input='<input id="form_'.$key.'" type="text" name="'.$key.'" placeholder="'.$tmp.'"/>';
+
+
+			if(isset($value->required)&&$value->required==true)
+				if(isset($value->unless))
+					$out.='<td class="name"><label for="form_'.$key.'"><span class="required">'.$key.'* <span class="unless">заменяется '.$value->unless.'</span></span></label></td>';
+				else
+					$out.='<td class="name"><label for="form_'.$key.'"><span class="required">'.$key.'*</span></label></td>';
+			else
+				$out.='<td class="name"><label for="form_'.$key.'"><span class="optional">'.$key.'</span></label></td>';
+
+			if(isset($value->description))
+				$out.='<td>'.$input.'</td>';
+				
+			$out.='</tr>';
+		}
+		$out.='<tr class="done"><td colspan="2"><input type="submit" value="Отправить запрос" /></td></tr></table>';
+		return $out;
+	}
 	function getParamsHTML($params=null)
 	{
 		$out='';
@@ -427,6 +528,8 @@ class core{
 			return '<p>Принимаемые параметры не перечислены в документации</p>';
 		foreach($params as $key=>$value)
 		{
+			if(isset($value->hidden)&&$value->hidden==true)
+				continue;
 			$out.='<div class="key">';
 			if(isset($value->values))
 			{
@@ -569,6 +672,7 @@ xml;
 	}
 	function declarateHTML($params=null)
 	{
+		$form="";
 		$tree=$this->getTree($params);
 		if(isset($this->config->params)&&isset($this->config->params->linkroot))
 			$linkroot=$this->config->params->linkroot;
@@ -615,9 +719,9 @@ xml;
 			}
 			else
 				$auth='<p>Этому методу <strong>не требуется</strong> проверка подлинности</p>';
-			 $params=$this->getParamsHTML($tree['tree']->params);
-
-
+			$params=$this->getParamsHTML($tree['tree']->params);
+			$form=$this->getParamsForm($tree['tree']->params);
+			
 			if(isset($tree['tree']->deprecate))
 			{
 				$dtime=$tree['tree']->deprecate;
@@ -636,6 +740,11 @@ $deprecate
 <p><a class="newtab" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
 <h3>Входные параметры</h3>
 {$params}
+<h3 id="openform">Форма для тестирования</h3>
+<form action="/method/{$tree['service']}.{$tree['name']}" method="post">
+
+{$form}
+</form>
 <h3>Аутентификация</h3>
 {$auth}
 EOF;

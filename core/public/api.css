@@ -144,9 +144,14 @@ p{
 p.info{
 	font-size: 0.8em;
 }
-div.key{
+table.form{
+	width: 100%;
+}
+div.key, table.form tr{
 	border-radius: .5em;
 	background-color: #CCC;
+}
+div.key{
 	margin: .4em;
 }
 div.key span.name{
@@ -196,10 +201,25 @@ div.key span.type{
 	margin: .3em .3em 0 0;
 	z-index:1;
 }
+table.form td{
+	padding: .5em;
+	border-radius: .5em;
+}
 div.key span.type.values{
 	border-radius: .5em 0 0 .5em;
 }
-div.key span.required{
+table.form td.name{
+	text-align: right;
+
+}
+table.form input{
+	padding:.25em .5em;
+	min-width: 16em;
+}
+tr.done td{
+	text-align: center;
+}
+div.key span.required, table.form span.required{
 	background-color: #A33;
 	color: white;
 	border-radius: .5em;
@@ -208,7 +228,18 @@ div.key span.required{
 	display: inline-block;
 	font-size: .8em;
 }
-div.key span.optional{
+table.form span.required, table.form span.optional{
+	margin: 0;
+}
+table.form option.null{
+	color: #3A3;
+	background-color: #CCC;
+}
+table.form textarea{	
+	width: 17em;
+	height: 5em;
+}
+div.key span.optional, table.form span.optional{
 	background-color: #DDD;
 	color: 333;
 	border-radius: .5em;
