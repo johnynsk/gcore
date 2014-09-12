@@ -286,7 +286,7 @@ div.key span.optional, table.form span.optional{
 	padding: .5em 1em;
 	font-size: .8em;
 }
-div.key span.unless{
+div.key span.unless, table.form span.unless{
 	display: inline-block;
 	margin: 0 -.75em 0 .5em;
 	background-color: white;
