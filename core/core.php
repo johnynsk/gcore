@@ -437,7 +437,7 @@ class core{
 		$out='<table class="form" id="testform"><tr><th class="name">ключ</th><th class="checkbox"><span title="Не передавать параметр">?</span></th><th>значение</th></tr>';//<tr class="using"><td class="name"><span class="optional">format</span></td><td></td><td><select name="format"><option>html</option><option>json</option><option>xml</option><option>php</option><option>plain</option><option>soap</option></select></td></tr><tr class="using"><td class="name"><span class="optional">callback</span></td><td></td><td><select name="format"><option>html</option><option>json</option><option>xml</option><option>php</option><option>plain</option><option>soap</option></select></td></tr>';
 		if(!isset($params))
 			return '<p>Принимаемые параметры не перечислены в документации</p>';
-		$params2=array("format"=>(object)array("type"=>"enum","description"=>"Формат данных ответа","values"=>array("html","json","xml","php","plain","soap"),"default"=>"html","notnull"=>true,"required"=>true),"callback"=>(object)array("type"=>"expression","description"=>"Название функции для JSONP","regexp"=>"//"));
+		$params2=array("format"=>(object)array("type"=>"enum","description"=>"Формат данных ответа","values"=>array("html","json","xml","php","plain","soap","jsonrpc"),"default"=>"html","notnull"=>true,"required"=>true),"callback"=>(object)array("type"=>"expression","description"=>"Название функции для JSONP","regexp"=>"//"));
 		$params2+=(array)$params;
 		$params=(object)$params2;
 		foreach($params as $key=>$value)
@@ -1176,6 +1176,14 @@ EOF;
 		}
 		return $response;
 	}
+	public static function jsonrpc_response($data,$return=false,$callback=null)
+	{	
+		$data2=array("jsonrpc"=>"2.0");
+		$data2+=(array)$data;
+		$data=(object)$data2;
+		unset($data2);
+		return self::json_response($data,$return,$callback);
+	}
 	public static function json_response($data,$return=false,$callback=null)
 	{
 		if(isset($callback)||isset($_GET["callback"]))
@@ -1397,6 +1405,9 @@ xml;
 			case 'xml':
 				$this->xml_response($data);
 				break;
+			case 'jsonrpc':
+				$this->jsonrpc_response($data,false,$callback);
+				break;
 			case 'json':
 				$this->json_response($data,false,$callback);
 				break;
@@ -1458,6 +1469,7 @@ xml;
 				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
 				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
+				$linkjsrpc=$linkroot.'method/'.$params["method"].'.jsonrpc?'.$query;
 				$api_version=self::$api_version;
 				$subtitle="";
 				if(isset($params["subtitle"]))
@@ -1465,7 +1477,7 @@ xml;
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
 				{
 					$links=<<<html
-					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkphp}">PHP</a></span>
+					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkjsrpc}">JSON-RPC</a> <a href="{$linkphp}">PHP</a></span>
 html;
 					$text='<div class="result">'.$text.'</div>';
 				}
