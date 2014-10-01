@@ -102,6 +102,7 @@ class core{
 		switch($type)
 		{
 			case 'string':
+			case 'text':
 				if(!is_string($data)&&!is_numeric($data))
 					return false;
 				break;
