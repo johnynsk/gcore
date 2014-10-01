@@ -1320,6 +1320,17 @@ EOF;
 			return false;
 		return true;
 	}
+	public function yaml_response($data=null,$return=false)
+	{
+		$response=yaml_emit(json_decode(json_encode($data),true));
+		if(!$return)
+		{
+			header("Content-Type: application/x-yaml");
+			echo $response;
+			exit;
+		}
+		return $response;
+	}
 	function soap_response($data,$fault=false,$params=null)
 	{
 		if(!$fault)
@@ -1408,6 +1419,12 @@ xml;
 			case 'jsonrpc':
 				$this->jsonrpc_response($data,false,$callback);
 				break;
+			case 'yaml':
+				if(function_exists('yaml_emit'))
+					$this->yaml_response($data,false);
+				else
+					throw new exception('Function yaml_emit does not avaliable. You should install Yaml package for use yaml output',500);
+				break;
 			case 'json':
 				$this->json_response($data,false,$callback);
 				break;
@@ -1470,6 +1487,7 @@ xml;
 				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
 				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
 				$linkjsrpc=$linkroot.'method/'.$params["method"].'.jsonrpc?'.$query;
+				$linkyaml=$linkroot.'method/'.$params["method"].'.yaml?'.$query;
 				$api_version=self::$api_version;
 				$subtitle="";
 				if(isset($params["subtitle"]))
@@ -1477,7 +1495,7 @@ xml;
 				if(isset($params['method'])&&!isset($params["title"])||(isset($params["type"])&&$params["type"]=="error"))
 				{
 					$links=<<<html
-					<span class="formats">Доступные форматы вывода данных: <a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkjsrpc}">JSON-RPC</a> <a href="{$linkphp}">PHP</a></span>
+					<span class="formats">Доступные форматы вывода данных: <br /><a href="{$linkjson}">JSON</a> <a href="{$linkxml}">XML</a> <a href="{$linktxt}">Plain</a> <a href="{$linkhtml}">HTML</a> <a href="{$linksoap}">SOAP</a> <a href="{$linkjsrpc}">JSON-RPC</a> <a href="{$linkyaml}">YAML</a> <a href="{$linkphp}">PHP</a></span>
 html;
 					$text='<div class="result">'.$text.'</div>';
 				}
