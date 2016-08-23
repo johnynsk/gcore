@@ -397,7 +397,7 @@ class core{
 			$linkroot=$this->config->params->linkroot;
 		else
 			$linkroot='/';
-		$template='<li><a href="'.$linkroot.'reference/%Uservice">%service<br />%description</a></li>';
+		$template='<li><a href="'.$linkroot.'?method=reference&wmethod=%Uservice">%service<br />%description</a></li>';
 		$labelnew='<span class="new">new</span>';
 		$labeldepr='<span class="deprecated">deprecated</span>';
 		$labeltest='<span class="untested">untested</span>';
@@ -760,10 +760,10 @@ EOF;
 			 $text=<<<EOF
 $deprecate
 <p>{$tree["tree"]->description}</p>
-<p><a class="newtab" href="{$linkroot}method/{$tree['service']}.{$tree['name']}">Вызвать метод: /method/{$tree['service']}.{$tree['name']} без параметров</a></p>
+<p><a class="newtab" href="{$linkroot}?method={$tree['service']}.{$tree['name']}">Вызвать метод: /?method={$tree['service']}.{$tree['name']} без параметров</a></p>
 <h3><span class="toggler active" data-toggle="block-params">Входные параметры</span><span class="toggler" data-toggle="block-form">Форма для тестирования</span></h3>
 <div class="toggler-block" data-toggle="block-params">{$params}</div>
-<div class="toggler-block hidden" data-toggle="block-form"><form action="/method/{$tree['service']}.{$tree['name']}" method="post">{$form}</form>
+<div class="toggler-block hidden" data-toggle="block-form"><form action="/?method={$tree['service']}.{$tree['name']}" method="post">{$form}</form>
 </div>
 <h3>Аутентификация</h3>
 {$auth}
@@ -774,7 +774,7 @@ EOF;
 			$reference=$this->genCoreHTML($tree['tree'],$tree['name'].".");
 			$text=<<<EOF
 	<h3>Новинка!</h3>
-	<p>Доступ к веб-сервису <strong>{$tree['method']}</strong> по протоколу SOAP: <a href="/reference/{$tree['method']}.wsdl">WSDL</a></p>
+	<p>Доступ к веб-сервису <strong>{$tree['method']}</strong> по протоколу SOAP: <a href="?method=reference&wmethod={$tree['method']}.wsdl">WSDL</a></p>
 	<h3>Доступные методы</h3>
 	{$reference}
 EOF;
@@ -1483,10 +1483,10 @@ xml;
 				if(!empty($params['method'])&&$params["method"]!="reference")
 				{
 					$button='главная/'.$params['method'];
-					$buttonlink=$linkroot.'reference/'.$params['method'];
+					$buttonlink=$linkroot.'?method=reference&wmethod='.$params['method'];
 				}else{
 					$button='главная/';
-					$buttonlink=$linkroot.'reference';
+					$buttonlink=$linkroot.'?method=reference';
 				}
 				if(isset($this->config->params)&&isset($this->config->params->httproot))
 					$httproot=$this->config->params->httproot;
