@@ -1,5 +1,16 @@
 <?php
 date_default_timezone_set('UTC');
+
+spl_autoload_register(function ($className) {
+    $fileName = $className;
+    $fileName = preg_replace('/_/', '/', $fileName);
+    $fileName = preg_replace('/\\\\/', '/', $fileName);
+    $fileName = __DIR__ . DIRECTORY_SEPARATOR . 'sources' . DIRECTORY_SEPARATOR . $fileName . '.php';
+    if (file_exists($fileName)) {
+        return require $fileName;
+    }
+}
+);
 try{
 //extra fault level
 	try{
