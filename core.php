@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('UTC');
 try{
 //extra fault level
 	try{
@@ -113,7 +114,7 @@ try{
 						"\t-f\t \n\t--format\tOuput data format\n \t \tAvailable formats: json, soap, php, xml, txt, html".
 						"\n\t-c\n\t--conf\tPath to config data\n \t \tDefault: conf.js:.htconf.js\n".
 						"\t-t\t\n\t--trace\tShow output trace\n";
-						exit;			
+						exit;
 					default:
 						if($key==0)
 							continue;

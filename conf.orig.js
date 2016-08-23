@@ -11,37 +11,13 @@
 		"support":"gcore@johnynsk.ru",
 		"limit_max":300,
 		"limit_default":30,
-		"httproot":"http://johnynsk.ru/v1/gcore/",
-		"linkroot":"http://johnynsk.ru/v1/",
+		"httproot":"/",
+		"linkroot":"/",
 		"authorize_package":"_std_auth",
 		"trace_allow":[
-		],
-		"reference_allow":[
 		]
 	},
 	"packages":{
-		"mysqlix":{
-			"location":"core/mysqlix/mysqlix.php",
-			"init":"core/mysqlix/init.php",
-			"params":{
-				"host":"localhost",
-				"user":"root",
-				"password":"",
-				"database":"database"
-			}
-		},
-		"_std_object":{
-			"location":"core/_std/_std_object.php",
-			"dependence":[
-				"mysqlix"
-			]
-		},
-		"_std_public":{
-			"location":"core/_std/_std_public.php",
-			"dependence":[
-				"_std_object"
-			]
-		},
 		"gcore_client":{
 			"location":"core/gcore_client/gcore_client.php",
 			"init":"core/gcore_client/init.php",

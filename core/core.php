@@ -96,7 +96,7 @@ class core{
 		}
 		return $data;
 	}
-	
+
 	static function checktype($data,$type,$expr='//')
 	{
 		switch($type)
@@ -117,7 +117,7 @@ class core{
 				if((float)$data<0)
 					return false;
 			case 'float':
-				if(!is_numeric($data))		
+				if(!is_numeric($data))
 					return false;
 				break;
 			case 'array':
@@ -156,7 +156,7 @@ class core{
 		}
 		return true;
 	}
-	
+
 	static function check($params,&$data,$sanitize=false)
 	{
 		if(!is_array($params))
@@ -168,7 +168,7 @@ class core{
 		{
 			if(!is_array($opt))
 				throw new exception("params for $key must be array",1);
-			
+
 			if(!isset($opt[0])||!isset($opt[1]))
 				throw new exception("params for $key must contain 2 items",2);
 
@@ -214,7 +214,7 @@ class core{
 				return $this->config->packages->{$tree}->params;
 			else
 				return null;
-			
+
 		return $this->config;
 	}
 	public function callMethod($name,$params)
@@ -232,7 +232,7 @@ class core{
 			throw new exception("Package '{$package}' not defined",0);
 		if(!isset($pkg->{$package}->{$method}))
 			throw new exception("Method '{$method}' is not declarated like public method of service {$package}",0);
-		
+
 		$mtree=&$pkg->{$package}->{$method};
 		$ignoreauth=false;
 		if(isset($this->config->params->ignore_auth)&&is_array($this->config->params->ignore_auth))
@@ -287,7 +287,7 @@ class core{
 	}
 	function checkParams($method,$package,&$params,$sanitize=false)
 	{
-		
+
 		$req=&$this->config->apiTree->{$package}->{$method};
 		if(!isset($req->params))
 			$req->params=null;
@@ -298,7 +298,7 @@ class core{
 		foreach($req as $k=>$v)
 		{
 			$check[$k]=array();
-			
+
 			if(isset($v->required)&&$v->required==true)
 				$check[$k][0]=true;
 			else
@@ -313,13 +313,13 @@ class core{
 					if($v->type=='enum'&&isset($v->values))
 						$check[$k][2]=$v->values;
 			$check[$k][1]=$v->type;
-			
+
 			if(isset($v->unless))
 				if($v->type=='regexp')
 					$check[$k][3]=$v->unless;
 				else
 					$check[$k][2]=$v->unless;
-				
+
 		}
 		return self::check($check,$params,$sanitize);
 	}
@@ -538,7 +538,7 @@ class core{
 			else
 				$out.='<td class="checkbox"></td>';
 			$out.='<td>'.$input.'</td>';
-				
+
 			$out.='</tr>';
 		}
 		$out.='<tr class="done"><td colspan="3"><input type="submit" value="Отправить запрос" /></td></tr></table><p>* - обязательный параметр</p>';
@@ -621,7 +621,7 @@ class core{
 
 			if(isset($value->description))
 				$out.='<span class="description">'.$value->description."</span>";
-				
+
 			$out.='</div>';
 		}
 		return $out;
@@ -744,7 +744,7 @@ xml;
 				$auth='<p>Этому методу <strong>не требуется</strong> проверка подлинности</p>';
 			$params=$this->getParamsHTML($tree['tree']->params);
 			$form=$this->getParamsForm($tree['tree']->params);
-			
+
 			if(isset($tree['tree']->deprecate))
 			{
 				$dtime=$tree['tree']->deprecate;
@@ -807,7 +807,7 @@ EOF;
 	}
 	public function getReq($package)
 	{
-		$cfg=&$this->config;	
+		$cfg=&$this->config;
 		if(!isset($cfg->packages->{$package}))
 			throw new exception("try to get undeclarated package");
 		$cfg->packages->{$package};
@@ -845,7 +845,7 @@ EOF;
 					{
 						if(!isset($settings->dataparams))
 							continue;
-					
+
 						foreach($settings->dataparams as $name)
 						{
 							if(!isset($cfg->dataparams))
@@ -893,7 +893,7 @@ EOF;
 		$params=&$pkg->$method->params;
 		if(!isset($pkg->$method->params->$name))
 			$params->$name=(object)array();
-		
+
 		//merge
 		//TODO WARNING (undefined definition of parameter :D)
 		$params->$name=(object)((array)$params->$name+(array)$settings);
@@ -917,7 +917,7 @@ EOF;
 					{
 						if(!isset($settings->dataparams))
 							continue;
-					
+
 						foreach($settings->dataparams as $name)
 						{
 							if(!isset($cfg->dataparams))
@@ -997,7 +997,7 @@ EOF;
 		{
 			if(isset($res->params->safemode)&&$res->params->safemode==true)
 				$this->safemode=true;
-			
+
 			if(isset($res->params->api_auth)&&$res->params->api_auth==true)
 				$this->api_auth=true;
 
@@ -1037,7 +1037,7 @@ EOF;
 		{
 
 			$mtree=&$pkg->{$package}->{$method};
-		
+
 			if((!isset($mtree->auth)||$mtree->auth==false)&&(!isset($mtree->auth_ip)||$mtree->auth_ip==false))
 				$permit=true;
 
@@ -1080,7 +1080,7 @@ EOF;
 		{
 			//remote call
 			foreach($this->config->params->trace_allow as $key)
-			{	
+			{
 				if($key==$_SERVER["REMOTE_ADDR"])
 					return true;
 			}
@@ -1178,7 +1178,7 @@ EOF;
 		return $response;
 	}
 	public static function jsonrpc_response($data,$return=false,$callback=null)
-	{	
+	{
 		$data2=array("jsonrpc"=>"2.0");
 		$data2+=(array)$data;
 		$data=(object)$data2;
@@ -1212,19 +1212,31 @@ EOF;
 	{
 		return json_decode(json_encode($data),true);
 	}
-	public static function xml_response($data,$return=false,$rootname="data",$xml=null)
+
+
+    /**
+     * Форматирует данные в XML
+     *
+     * @param array $data
+     * @param bool $return
+     * @param string $rootName
+     * @return string
+     */
+    public static function xml_response($data, $return = false, $rootName = "data")
 	{
-//		$wrap='data';
-//		$data=self::objectToAssoc($data);
-//		$data=array($wrap=>$data);
-		if(!$return)
-		{
-			header("Content-Type: text/xml");
-			echo self::xml_encode($data,$xml,$rootname);
-			exit;
-		}
-		return self::xml_encode($data,$xml,$rootname);
+        $formatter = \Gcore\Formatter\Factory::getXml($data);
+        $formatter->setRootName($rootName);
+
+        if ($return) {
+            return $formatter->format();
+        }
+
+        header("Content-Type: " . $formatter->getContentType());
+        echo $formatter->format();
+        exit;
 	}
+
+
 	public function html_var_prepare($data)
 	{
 		$str='';
@@ -1297,6 +1309,8 @@ EOF;
 		}
 		return true;
 	}
+
+
 	public function plain_response($data=null,$return=false)
 	{
 //		$response=var_export($data,true);
@@ -1464,7 +1478,7 @@ xml;
 				$date=date('d M Y H:i:s');
 				if(isset($this->config->params)&&isset($this->config->params->linkroot))
 					$linkroot=$this->config->params->linkroot;
-				else	
+				else
 					$linkroot="/";
 				if(!empty($params['method'])&&$params["method"]!="reference")
 				{

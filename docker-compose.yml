@@ -1,0 +1,14 @@
+nginx:
+    build: ./images/nginx/
+    links:
+        - fpm
+    ports:
+        - 8080:80
+    volumes:
+        - ./app/system/nginx/:/data/config/
+        - ./:/data/project
+
+fpm:
+    build: ./images/php/
+    volumes:
+        - ./:/data/project
