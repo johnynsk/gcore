@@ -1,10 +1,8 @@
 var tmp=null;
-window.onload=function()
-{
-	var a=document.getElementsByClassName("toggler");
-	for(i in a)
-	{
-		a[i].onclick=function(c){
+window.onload = function() {
+	var elements = document.getElementsByClassName("toggler");
+	for (var key in elements) {
+		elements[key].onclick = function(c) {
 			c=c.toElement;
 			var active=c.attributes.getNamedItem("data-toggle").value;
 			var a=document.getElementsByClassName("toggler");
@@ -25,7 +23,9 @@ window.onload=function()
 				else
 					a[i].classList.add("hidden");
 			}
-		}
+
+			return false;
+		};
 	}
 	var a=document.getElementsByClassName("form_input");
 	for(i in a)

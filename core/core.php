@@ -761,7 +761,7 @@ EOF;
 $deprecate
 <p>{$tree["tree"]->description}</p>
 <p><a class="newtab" href="{$linkroot}?method={$tree['service']}.{$tree['name']}">Вызвать метод: /?method={$tree['service']}.{$tree['name']} без параметров</a></p>
-<h3><span class="toggler active" data-toggle="block-params">Входные параметры</span><span class="toggler" data-toggle="block-form">Форма для тестирования</span></h3>
+<h3><a href="#" class="toggler active" data-toggle="block-params">Expected input params</a><a href="#" class="toggler" data-toggle="block-form">Testing form</a></h3>
 <div class="toggler-block" data-toggle="block-params">{$params}</div>
 <div class="toggler-block hidden" data-toggle="block-form"><form action="/?method={$tree['service']}.{$tree['name']}" method="post">{$form}</form>
 </div>
