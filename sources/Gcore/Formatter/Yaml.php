@@ -2,6 +2,7 @@
 namespace Gcore\Formatter;
 
 use Gcore\FormatterAbstract;
+use Symfony\Component\Yaml\Yaml as YamlLibrary;
 
 class Yaml extends FormatterAbstract
 {
@@ -15,6 +16,6 @@ class Yaml extends FormatterAbstract
 
     public function format()
     {
-        return yaml_emit($this->_data);
+        return YamlLibrary::dump($this->_data);
     }
 }

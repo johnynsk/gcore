@@ -1,6 +1,8 @@
 <?php
 date_default_timezone_set('UTC');
 
+require __DIR__ . '/vendor/autoload.php';
+
 spl_autoload_register(function ($className) {
     $fileName = $className;
     $fileName = preg_replace('/_/', '/', $fileName);

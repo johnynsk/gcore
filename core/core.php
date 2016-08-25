@@ -647,18 +647,18 @@ class core{
 			</s:element>
 		</s:schema>
 	</types>
-	
+
 	<message name="SoapIn">
 		<part name="parameters" element="s:string"/>
 	</message>
 	<message name="SoapOut">
 		<part name="parameters" element="s0:soapResponse"/>
 	</message>
-	
+
 	<portType name="cinemaSoap">
 %operations;
 	</portType>
-	
+
 	<binding name="cinemaSoap" type="s0:cinemaSoap">
 		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
 %bindings;
@@ -774,7 +774,7 @@ EOF;
 			$reference=$this->genCoreHTML($tree['tree'],$tree['name'].".");
 			$text=<<<EOF
 	<h3>Новинка!</h3>
-	<p>Доступ к веб-сервису <strong>{$tree['method']}</strong> по протоколу SOAP: <a href="?method=reference&wmethod={$tree['method']}.wsdl">WSDL</a></p>
+	<p>Доступ к веб-сервису <strong>{$tree['method']}</strong> по протоколу SOAP: <a href="?method=reference&wmethod={$tree['method']}&format=wsdl">WSDL</a></p>
 	<h3>Доступные методы</h3>
 	{$reference}
 EOF;
@@ -1334,18 +1334,29 @@ EOF;
 		if($code>=0x6000&&$code<0x7FFE)
 			return false;
 		return true;
-	}
-	public function yaml_response($data=null,$return=false)
-	{
-		$response=yaml_emit(json_decode(json_encode($data),true));
-		if(!$return)
-		{
-			header("Content-Type: application/x-yaml");
-			echo $response;
-			exit;
-		}
-		return $response;
-	}
+    }
+
+
+    /**
+     * Возвращает ответ сформатированный в yaml
+     *
+     * @param array $data
+     * @param bool $return
+     */
+    public function yaml_response($data, $return = false)
+    {
+        $formatter = \Gcore\Formatter\Factory::getYaml($data);
+
+        if ($return) {
+            return $formatter->format();
+        }
+
+        header("Content-Type: " . $formatter->getContentType());
+        echo $formatter->format();
+        exit;
+    }
+
+
 	function soap_response($data,$fault=false,$params=null)
 	{
 		if(!$fault)
@@ -1435,10 +1446,7 @@ xml;
 				$this->jsonrpc_response($data,false,$callback);
 				break;
 			case 'yaml':
-				if(function_exists('yaml_emit'))
-					$this->yaml_response($data,false);
-				else
-					throw new exception('Function yaml_emit does not avaliable. You should install Yaml package for use yaml output',500);
+                $this->yaml_response($data,false);
 				break;
 			case 'json':
 				$this->json_response($data,false,$callback);
@@ -1493,16 +1501,16 @@ xml;
 				else
 					$httproot="/";
 				$tmp=$_ENV["params"];
-				unset($tmp["format"]);
+                unset($tmp["format"]);
 				$query=http_build_query($tmp);
-				$linkxml=$linkroot.'method/'.$params["method"].'.xml?'.$query;
-				$linktxt=$linkroot.'method/'.$params["method"].'.txt?'.$query;
-				$linkphp=$linkroot.'method/'.$params["method"].'.php?'.$query;
-				$linkhtml=$linkroot.'method/'.$params["method"].'.html?'.$query;
-				$linksoap=$linkroot.'method/'.$params["method"].'.soap?'.$query;
-				$linkjson=$linkroot.'method/'.$params["method"].'.json?'.$query;
-				$linkjsrpc=$linkroot.'method/'.$params["method"].'.jsonrpc?'.$query;
-				$linkyaml=$linkroot.'method/'.$params["method"].'.yaml?'.$query;
+				$linkxml=$linkroot.'?method='.$params["method"].'&format=xml&'.$query;
+				$linktxt=$linkroot.'?method='.$params["method"].'&format=txt&'.$query;
+				$linkphp=$linkroot.'?method='.$params["method"].'&format=php&'.$query;
+				$linkhtml=$linkroot.'?method='.$params["method"].'&format=html&'.$query;
+				$linksoap=$linkroot.'?method='.$params["method"].'&format=soap&'.$query;
+				$linkjson=$linkroot.'?method='.$params["method"].'&format=json&'.$query;
+				$linkjsrpc=$linkroot.'?method='.$params["method"].'&format=jsonrpc&'.$query;
+				$linkyaml=$linkroot.'?method='.$params["method"].'&format=yaml&'.$query;
 				$api_version=self::$api_version;
 				$subtitle="";
 				if(isset($params["subtitle"]))

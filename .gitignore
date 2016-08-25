@@ -8,3 +8,5 @@ conf.js
 *.swp
 *.swo
 *.ini
+vendor/*
+

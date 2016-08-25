@@ -3,7 +3,7 @@ nginx:
     links:
         - fpm
     ports:
-        - 8080:80
+        - 8030:80
     volumes:
         - ./app/system/nginx/:/data/config/
         - ./:/data/project

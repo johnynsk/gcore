@@ -4,12 +4,16 @@ namespace Gcore\Formatter;
 
 use Gcore\FormatterAbstract;
 
+/**
+ * Class formatter to XML
+ */
 class Xml extends FormatterAbstract
 {
     /**
      * @var string
      */
     protected $_rootName;
+
 
     /**
      * Xml constructor.
@@ -21,10 +25,16 @@ class Xml extends FormatterAbstract
     {
         $this->_contentType = 'text/xml';
         $this->_rootName = $rootName;
+
         parent::__construct($data);
+
+        $this->_data = $this->_convertToArray($data);
     }
 
+
     /**
+     * Formats data to xml
+     *
      * @return string
      */
     public function format()
@@ -40,8 +50,9 @@ class Xml extends FormatterAbstract
         return $result;
     }
 
+
     /**
-     * Устанавливает корневое имя
+     * Sets XML's root name
      *
      * @param string $rootName
      */
@@ -50,28 +61,30 @@ class Xml extends FormatterAbstract
         $this->_rootName = $rootName;
     }
 
+
     /**
-     * Добавляет элементу аттрибуты
+     * Adds attributes into node
      *
      * @param $data
      * @param \SimpleXMLElement $xml
      *
      * @return \SimpleXMLElement
      */
-    private function _prepareAttribute($data, \SimpleXMLElement $xml)
+    private function _prepareAttribute($data, \SimpleXMLElement $node)
     {
         foreach ($data as $key => $value) {
             if ($key != GENERIC_CORE_CDATA) {
-                $xml->addAttribute($key, $value);
+                $node->addAttribute($key, $value);
             }
         }
 
-        return $xml;
+        return $node;
     }
 
 
     /**
-     * Готовит ноду
+     * Preparing XML node
+     * some legacy magic
      *
      * @param $data
      * @param \SimpleXMLElement $xml
@@ -130,7 +143,22 @@ class Xml extends FormatterAbstract
                     $item->addAttribute("order", $order);
                 }
             }
-            $this->_prepareNode($value, $item);
+
+            if ($value) {
+                $this->_prepareNode($value, $item);
+            }
         }
+    }
+
+    /**
+     * Cast object into array
+     *
+     * @param stdClass|array $data
+     *
+     * @return array
+     */
+    private function _convertToArray($data)
+    {
+        return json_decode(json_encode($data), true);
     }
 }
